@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SyncFlow v3 for Google</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-/* ── RESET & VARIABLES ── */
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SyncFlow v3 for Google</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+/* — RESET & VARIABLES — */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#f8f9fb; --surface:#fff; --surface-2:#f1f3f5; --surface-3:#e9ecef;
@@ -20,254 +20,233 @@
   --shadow-lg:0 10px 25px rgba(0,0,0,.1),0 4px 10px rgba(0,0,0,.06);
 }
 body{
-  font-family:'DM Sans',system-ui,sans-serif;
-  background:var(--bg); color:var(--text);
-  min-height:100vh; line-height:1.6;
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  line-height:1.5;
+}
+/* — LAYOUT — */
+.app-header{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:16px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky; top:0; z-index:100;
+}
+.app-header h1{
+  font-size:18px; font-weight:600; color:var(--text);
+  display:flex; align-items:center; gap:8px;
+}
+.app-header h1 span{ color:var(--blue); }
+.conn-badge{
+  font-size:12px; padding:4px 10px; border-radius:20px;
+  font-weight:500; display:flex; align-items:center; gap:4px;
+}
+.conn-badge.ok{ background:var(--green-light); color:var(--green); }
+.conn-badge.err{ background:var(--red-light); color:var(--red); }
+.conn-badge::before{ content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+.container{
+  max-width:640px; margin:0 auto; padding:20px 16px 80px;
+  display:flex; flex-direction:column; gap:16px;
 }
 
-/* ── LAYOUT ── */
-.app-container{max-width:520px;margin:0 auto;padding:16px 16px 100px}
-
-/* ── HEADER ── */
-.header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 0;margin-bottom:20px;
-}
-.header-left{display:flex;align-items:center;gap:10px}
-.header-icon{
-  width:36px;height:36px;border-radius:10px;
-  background:linear-gradient(135deg,var(--blue),var(--purple));
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:16px;font-weight:700;
-}
-.header-title{font-size:18px;font-weight:700;letter-spacing:-.3px}
-.header-title span{color:var(--text-3);font-weight:400;font-size:13px;margin-left:4px}
-.connection-badge{
-  display:flex;align-items:center;gap:5px;
-  padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;
-  background:var(--red-light);color:var(--red);transition:all .3s;
-}
-.connection-badge.connected{background:var(--green-light);color:var(--green)}
-.connection-badge::before{
-  content:'';width:6px;height:6px;border-radius:50%;
-  background:currentColor;
-}
-
-/* ── CARDS ── */
+/* — CARD — */
 .card{
-  background:var(--surface);border-radius:var(--radius);
-  padding:20px;margin-bottom:14px;
+  background:var(--surface);
   border:1px solid var(--border);
+  border-radius:var(--radius);
   box-shadow:var(--shadow);
+  overflow:hidden;
 }
 .card-header{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:14px;
+  padding:16px 20px 12px;
+  display:flex; align-items:center; justify-content:space-between;
 }
-.card-title{font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.6px}
-.card-count{
-  background:var(--blue-light);color:var(--blue);
-  padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700;
+.card-title{
+  font-size:14px; font-weight:600; color:var(--text);
+  display:flex; align-items:center; gap:6px;
+}
+.card-body{ padding:0 20px 20px; }
+
+/* — MEMBERS — */
+.member-section{ display:flex; flex-direction:column; gap:12px; }
+.member-input-wrap{
+  position:relative;
+}
+.member-input{
+  width:100%; padding:10px 14px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  font-size:14px; font-family:inherit;
+  outline:none; transition:border-color .2s;
+  background:var(--surface);
+}
+.member-input:focus{ border-color:var(--blue); }
+.member-input::placeholder{ color:var(--text-3); }
+
+/* — SUGGEST DROPDOWN — */
+.suggest-dropdown{
+  position:absolute; top:100%; left:0; right:0;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  box-shadow:var(--shadow-lg);
+  max-height:240px; overflow-y:auto;
+  z-index:200;
+  display:none;
+  margin-top:4px;
+}
+.suggest-dropdown.open{ display:block; }
+.suggest-item{
+  display:flex; align-items:center; gap:12px;
+  padding:10px 14px;
+  cursor:pointer;
+  transition:background .15s;
+}
+.suggest-item:hover, .suggest-item.active{
+  background:var(--surface-2);
+}
+.suggest-avatar{
+  width:36px; height:36px; border-radius:50%;
+  background:var(--blue-light); color:var(--blue);
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:600; flex-shrink:0;
+}
+.suggest-info{ flex:1; min-width:0; }
+.suggest-name{
+  font-size:14px; font-weight:500; color:var(--text);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.suggest-email{
+  font-size:12px; color:var(--text-3);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
-/* ── STATS ROW ── */
-.stats-row{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;
+/* — SELECTED MEMBERS (CHIPS) — */
+.member-chips{
+  display:flex; flex-wrap:wrap; gap:6px;
 }
-.stat-item{
-  background:var(--surface-2);border-radius:var(--radius-sm);
-  padding:12px;text-align:center;
+.member-chip{
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--blue-light); color:var(--blue);
+  padding:4px 10px 4px 6px;
+  border-radius:20px; font-size:13px; font-weight:500;
 }
-.stat-value{font-size:22px;font-weight:700;color:var(--blue);line-height:1}
-.stat-label{font-size:10px;color:var(--text-3);margin-top:4px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.member-chip .chip-avatar{
+  width:22px; height:22px; border-radius:50%;
+  background:var(--blue); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:600;
+}
+.member-chip .chip-remove{
+  cursor:pointer; opacity:.6;
+  font-size:16px; line-height:1;
+  transition:opacity .15s;
+}
+.member-chip .chip-remove:hover{ opacity:1; }
 
-/* ── MEMBERS ── */
-.member-list{display:flex;flex-direction:column;gap:6px}
-.member-item{
-  display:flex;align-items:center;gap:10px;
-  padding:8px 12px;border-radius:var(--radius-sm);
-  background:var(--surface-2);font-size:13px;
-  transition:background .2s;
+/* — SEARCH CONTROLS — */
+.search-controls{ display:flex; flex-direction:column; gap:12px; }
+.control-row{
+  display:flex; gap:10px; align-items:center;
 }
-.member-item:hover{background:var(--surface-3)}
-.member-avatar{
-  width:28px;height:28px;border-radius:50%;
-  background:linear-gradient(135deg,var(--blue),var(--purple));
-  display:flex;align-items:center;justify-content:center;
-  color:#fff;font-size:11px;font-weight:700;flex-shrink:0;
+.control-row label{
+  font-size:13px; color:var(--text-2); white-space:nowrap; min-width:60px;
 }
-.member-email{color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* ── DURATION SELECTOR ── */
-.duration-selector{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
-.dur-btn{
-  padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);
-  background:var(--surface);font-size:12px;font-weight:600;
-  color:var(--text-2);cursor:pointer;transition:all .2s;
-  font-family:inherit;
+.control-row select, .control-row input[type="number"]{
+  flex:1; padding:8px 12px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius-sm);
+  font-size:14px; font-family:inherit;
+  background:var(--surface);
+  outline:none;
 }
-.dur-btn:hover{border-color:var(--blue);color:var(--blue)}
-.dur-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
-
-/* ── SEARCH BUTTON ── */
+.control-row select:focus, .control-row input:focus{
+  border-color:var(--blue);
+}
 .search-btn{
-  width:100%;padding:14px;border:none;border-radius:var(--radius);
-  background:linear-gradient(135deg,var(--blue),var(--purple));
-  color:#fff;font-size:15px;font-weight:700;cursor:pointer;
-  font-family:inherit;transition:all .2s;
-  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%; padding:12px;
+  background:var(--blue); color:#fff;
+  border:none; border-radius:var(--radius-sm);
+  font-size:14px; font-weight:600; font-family:inherit;
+  cursor:pointer; transition:background .2s;
 }
-.search-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-lg)}
-.search-btn:active{transform:translateY(0)}
-.search-btn.loading{opacity:.7;pointer-events:none}
-.search-btn.loading .btn-icon{animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
+.search-btn:hover{ background:#1557b0; }
+.search-btn:disabled{
+  background:var(--text-3); cursor:not-allowed;
+}
 
-/* ── SLOT RESULTS ── */
-.slot-list{display:flex;flex-direction:column;gap:8px}
-.slot-item{
-  display:flex;align-items:center;gap:12px;
-  padding:14px;border-radius:var(--radius-sm);
-  border:1.5px solid var(--border);background:var(--surface);
-  transition:all .2s;cursor:pointer;
+/* — RESULTS — */
+.result-list{ display:flex; flex-direction:column; gap:8px; }
+.slot-card{
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:14px 16px;
+  display:flex; align-items:center; justify-content:space-between;
+  cursor:pointer; transition:all .2s;
 }
-.slot-item:hover{border-color:var(--blue);background:var(--blue-light)}
-.slot-day{
-  text-align:center;min-width:44px;
+.slot-card:hover{
+  border-color:var(--blue); background:var(--blue-light);
 }
-.slot-day-name{font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase}
-.slot-day-num{font-size:20px;font-weight:700;color:var(--text);line-height:1.1}
-.slot-day-mon{font-size:10px;color:var(--text-3)}
-.slot-info{flex:1}
-.slot-time{font-size:14px;font-weight:700;color:var(--text)}
-.slot-meta{font-size:11px;color:var(--text-3);margin-top:2px}
+.slot-date{ font-size:14px; font-weight:500; }
+.slot-time{ font-size:13px; color:var(--text-2); }
 .slot-score{
-  font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;
+  font-size:12px; font-weight:600;
+  background:var(--green-light); color:var(--green);
+  padding:2px 8px; border-radius:10px;
 }
-.slot-score.high{background:var(--green-light);color:var(--green)}
-.slot-score.mid{background:var(--yellow-light);color:var(--yellow)}
-.slot-score.low{background:var(--red-light);color:var(--red)}
+.copy-toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  background:var(--text); color:#fff; padding:10px 20px;
+  border-radius:8px; font-size:13px; font-weight:500;
+  opacity:0; transition:opacity .3s; pointer-events:none; z-index:999;
+}
+.copy-toast.show{ opacity:1; }
 
-/* ── SUGGEST INPUT ── */
-.suggest-section{margin-top:14px}
-.suggest-input-row{display:flex;gap:8px;margin-bottom:10px}
-.suggest-input{
-  flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
-  font-size:13px;font-family:inherit;background:var(--surface);color:var(--text);
-  outline:none;transition:border-color .2s;
-}
-.suggest-input:focus{border-color:var(--blue)}
-.suggest-btn{
-  padding:10px 16px;border:none;border-radius:var(--radius-sm);
-  background:var(--purple);color:#fff;font-size:13px;font-weight:600;
-  cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .2s;
-}
-.suggest-btn:hover{opacity:.9}
-
-/* ── TOAST ── */
-.toast-container{
-  position:fixed;top:16px;left:50%;transform:translateX(-50%);
-  z-index:9999;display:flex;flex-direction:column;gap:8px;
-  pointer-events:none;
-}
-.toast{
-  padding:10px 18px;border-radius:var(--radius-sm);
-  font-size:13px;font-weight:500;pointer-events:auto;
-  animation:toastIn .3s ease;box-shadow:var(--shadow-lg);
-  max-width:360px;text-align:center;
-}
-.toast.success{background:var(--green);color:#fff}
-.toast.error{background:var(--red);color:#fff}
-.toast.info{background:var(--text);color:#fff}
-@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── SETTINGS SECTION ── */
-.settings-toggle{
-  display:flex;align-items:center;gap:8px;
-  padding:10px 14px;border-radius:var(--radius-sm);
-  background:var(--surface-2);font-size:12px;color:var(--text-2);
-  cursor:pointer;border:none;font-family:inherit;font-weight:500;
-  width:100%;text-align:left;transition:background .2s;
-}
-.settings-toggle:hover{background:var(--surface-3)}
-.settings-panel{
-  display:none;margin-top:10px;padding:14px;
-  background:var(--surface-2);border-radius:var(--radius-sm);
-}
-.settings-panel.open{display:block}
-.settings-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.settings-row label{font-size:12px;color:var(--text-2);font-weight:500;min-width:70px}
-.settings-row input{
-  flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;
-  font-size:12px;font-family:'DM Mono',monospace;background:var(--surface);
-  color:var(--text);outline:none;
-}
-.settings-row input:focus{border-color:var(--blue)}
-.save-url-btn{
-  margin-top:8px;padding:8px 16px;border:none;border-radius:6px;
-  background:var(--blue);color:#fff;font-size:12px;font-weight:600;
-  cursor:pointer;font-family:inherit;
-}
-
-/* ── FOOTER ── */
-.footer-note{
-  font-size:11px;color:var(--text-3);text-align:center;
-  margin-top:10px;line-height:1.5;
-}
-
-/* ── EMPTY STATE ── */
+/* — EMPTY STATE — */
 .empty-state{
-  text-align:center;padding:30px 20px;color:var(--text-3);
+  text-align:center; padding:32px 16px; color:var(--text-3);
 }
-.empty-state-icon{font-size:36px;margin-bottom:8px}
-.empty-state-text{font-size:13px}
+.empty-state-icon{ font-size:32px; margin-bottom:8px; }
+.empty-state-text{ font-size:13px; }
 
-/* ── RESPONSIVE ── */
-@media(max-width:400px){
-  .stats-row{grid-template-columns:repeat(2,1fr)}
-  .duration-selector{gap:4px}
-  .dur-btn{padding:5px 10px;font-size:11px}
+/* — LOADING — */
+.loading{ text-align:center; padding:24px; color:var(--text-3); font-size:13px; }
+.loading::before{
+  content:''; display:block; width:24px; height:24px; margin:0 auto 8px;
+  border:2px solid var(--border); border-top-color:var(--blue);
+  border-radius:50%; animation:spin .6s linear infinite;
 }
-</style>
+@keyframes spin{ to{transform:rotate(360deg)} }
+  </style>
 </head>
 <body>
 
-<div class="app-container">
-  <!-- HEADER -->
-  <div class="header">
-    <div class="header-left">
-      <div class="header-icon">S</div>
-      <span class="header-title">SyncFlow <span>v3</span></span>
-    </div>
-    <div class="connection-badge" id="connBadge">未接続</div>
-  </div>
+<!-- HEADER -->
+<header class="app-header">
+  <h1>📅 <span>SyncFlow</span> v3</h1>
+  <div class="conn-badge err" id="connBadge">未接続</div>
+</header>
 
-  <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat-item">
-      <div class="stat-value" id="memberCount">0</div>
-      <div class="stat-label">メンバー</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-value" id="slotCount">0</div>
-      <div class="stat-label">空き枠</div>
-    </div>
-    <div class="stat-item">
-      <div class="stat-value" id="lastSync">--</div>
-      <div class="stat-label">最終同期</div>
-    </div>
-  </div>
+<div class="container">
 
-  <!-- MEMBERS CARD -->
+  <!-- MEMBER CARD -->
   <div class="card">
     <div class="card-header">
-      <span class="card-title">メンバー</span>
-      <button class="save-url-btn" id="refreshMembersBtn" style="margin:0;padding:4px 12px;font-size:11px">🔄 更新</button>
+      <span class="card-title">👥 参加者</span>
+      <span id="memberCount" style="font-size:12px;color:var(--text-3)">0名</span>
     </div>
-    <div class="member-list" id="memberList">
-      <div class="empty-state">
-        <div class="empty-state-icon">👥</div>
-        <div class="empty-state-text">GAS URLを設定してメンバーを読み込み</div>
+    <div class="card-body member-section">
+      <div id="memberChips" class="member-chips"></div>
+      <div class="member-input-wrap">
+        <input type="text" class="member-input" id="memberInput"
+               placeholder="名前またはメールで検索..." autocomplete="off">
+        <div class="suggest-dropdown" id="suggestDropdown"></div>
       </div>
     </div>
   </div>
@@ -275,293 +254,265 @@ body{
   <!-- SEARCH CARD -->
   <div class="card">
     <div class="card-header">
-      <span class="card-title">空き時間を検索</span>
+      <span class="card-title">🔍 空き枠を探す</span>
     </div>
-
-    <!-- Duration Selector -->
-    <div class="duration-selector" id="durationSelector">
-      <button class="dur-btn" data-dur="30">30分</button>
-      <button class="dur-btn active" data-dur="60">1時間</button>
-      <button class="dur-btn" data-dur="90">1.5時間</button>
-      <button class="dur-btn" data-dur="120">2時間</button>
+    <div class="card-body search-controls">
+      <div class="control-row">
+        <label>所要時間</label>
+        <select id="durationSelect">
+          <option value="30">30分</option>
+          <option value="60" selected>60分</option>
+          <option value="90">90分</option>
+          <option value="120">120分</option>
+        </select>
+      </div>
+      <button class="search-btn" id="searchBtn" onclick="searchSlots()">🔍 空き枠を検索</button>
     </div>
+  </div>
 
-    <!-- Search Button -->
-    <button class="search-btn" id="searchBtn" onclick="searchSlots()">
-      <span class="btn-icon">🔍</span>
-      <span id="searchBtnText">空き時間を検索</span>
-    </button>
-
-    <!-- Slot Results -->
-    <div style="margin-top:14px">
-      <div class="slot-list" id="slotList">
+  <!-- RESULTS CARD -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📋 検索結果</span>
+      <span id="slotCount" style="font-size:12px;color:var(--text-3)"></span>
+    </div>
+    <div class="card-body">
+      <div id="slotList">
         <div class="empty-state">
-          <div class="empty-state-icon">📅</div>
-          <div class="empty-state-text">検索ボタンを押して空き枠を探す</div>
+          <div class="empty-state-icon">📭</div>
+          <div class="empty-state-text">参加者を選んで検索ボタンを押してください</div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- SUGGEST CARD -->
-  <div class="card suggest-section">
-    <div class="card-header">
-      <span class="card-title">サジェスト機能</span>
-    </div>
-    <div class="suggest-input-row">
-      <input class="suggest-input" id="suggestInput" placeholder="例: 来週の月曜午後に会議を入れたい" />
-      <button class="suggest-btn" id="suggestBtn" onclick="suggestSlots()">提案</button>
-    </div>
-    <div id="suggestResult"></div>
-  </div>
-
-  <!-- SETTINGS -->
-  <div class="card">
-    <button class="settings-toggle" onclick="toggleSettings()">⚙️ GAS URL設定</button>
-    <div class="settings-panel" id="settingsPanel">
-      <div class="settings-row">
-        <label>GAS URL</label>
-        <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." />
-      </div>
-      <button class="save-url-btn" onclick="saveGasUrl()">保存して接続</button>
-      <div class="footer-note">※ GAS v3 WebアプリのURLを入力してください。Calendar Advanced Serviceを有効にすると、同一Workspaceのメンバーを自動取得できます。</div>
-    </div>
-  </div>
 </div>
 
-<!-- TOAST CONTAINER -->
-<div class="toast-container" id="toastContainer"></div>
+<!-- TOAST -->
+<div class="copy-toast" id="toastContainer"></div>
 
 <script>
-// ─── STATE ─────────────────────────────────────────────────
-let gasUrl = localStorage.getItem('syncflow_gas_url') || 'https://script.google.com/macros/s/AKfycbz6ybss582Me2d8QBh3KwpAG0zq7m0346YUTP3tk5vuYXMi_u8NgU6DpXvhMykW-X6ADQlbwb7yI96Q/exec';
-let members = [];
-let slots = [];
-let selectedDuration = 60;
+// ─────────────────────────────────────────────
+// CONFIG — GAS URL ハードコード
+// ─────────────────────────────────────────────
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz6ybss582Me2d8QBh3KwpAG0zq7m0346YUTP3tk5vuYXMi_u8NgU6DpXvhMykW-X6ADQ/exec';
 
-// ─── INIT ──────────────────────────────────────────────────
-(function init() {
-  document.getElementById('gasUrlInput').value = gasUrl;
-  if (gasUrl) {
-    updateConnectionBadge(true);
-    fetchMembers();
-  }
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let allMembers = [];        // {email, name} from GAS
+let selectedMembers = [];   // emails
+let suggestIndex = -1;
 
-  // Duration selector
-  document.querySelectorAll('.dur-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      selectedDuration = parseInt(btn.dataset.dur);
-    });
-  });
-
-  document.getElementById('refreshMembersBtn').addEventListener('click', fetchMembers);
-
-  // Suggest enter key
-  document.getElementById('suggestInput').addEventListener('keydown', e => {
-    if (e.key === 'Enter') suggestSlots();
-  });
-})();
-
-// ─── GAS URL MANAGEMENT ───────────────────────────────────
-function saveGasUrl() {
-  const url = document.getElementById('gasUrlInput').value.trim();
-  if (!url) { showToast('URLを入力してください', 'error'); return; }
-  gasUrl = url;
-  localStorage.setItem('syncflow_gas_url', gasUrl);
-  updateConnectionBadge(true);
-  showToast('✅ GAS URL を保存しました', 'success');
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
   fetchMembers();
-}
+  setupMemberInput();
+});
 
-function toggleSettings() {
-  document.getElementById('settingsPanel').classList.toggle('open');
-}
-
-function updateConnectionBadge(connected) {
-  const badge = document.getElementById('connBadge');
-  if (connected) {
-    badge.textContent = '接続中';
-    badge.classList.add('connected');
-  } else {
-    badge.textContent = '未接続';
-    badge.classList.remove('connected');
-  }
-}
-
-// ─── FETCH MEMBERS ────────────────────────────────────────
+// ─────────────────────────────────────────────
+// GAS: FETCH MEMBERS
+// ─────────────────────────────────────────────
 async function fetchMembers() {
-  if (!gasUrl) {
-    showToast('先にGAS URLを保存してください', 'error');
-    return;
-  }
-  const btn = document.getElementById('refreshMembersBtn');
-  btn.disabled = true;
-  btn.innerHTML = '⏳ 読轼中…';
-
   try {
     const params = new URLSearchParams({ action: 'members' });
-    const res = await fetch(gasUrl + '?' + params.toString());
+    const res = await fetch(GAS_URL + '?' + params.toString());
     const data = await res.json();
-
-    if (data.status === 'success') {
-      members = data.members || [];
-      renderMembers(members);
-      document.getElementById('memberCount').textContent = members.length;
-      setLastSync();
+    if (data.status === 'success' && data.members) {
+      // members can be array of strings (emails) or objects
+      allMembers = data.members.map(m => {
+        if (typeof m === 'string') {
+          return { email: m, name: m.split('@')[0] };
+        }
+        return { email: m.email || m, name: m.name || m.email?.split('@')[0] || '' };
+      });
       updateConnectionBadge(true);
-      showToast(`${members.length}名のメンバーを取得しました`, 'success');
+      showToast(`✅ ${allMembers.length}名のメンバーを取得しました`, 'success');
     } else {
-      throw new Error(data.message || 'GASエラー');
+      throw new Error(data.message || 'メンバー取得失敗');
     }
-  } catch(e) {
-    members = ['tanaka@example.com','sato@example.com','suzuki@example.com'];
-    renderMembers(members);
-    document.getElementById('memberCount').textContent = members.length;
-    setLastSync();
-    showToast('⚠️ デモデータを表示中 (GAS未接続)', 'info');
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '🔄 更新';
+  } catch (e) {
+    updateConnectionBadge(false);
+    showToast('⚠️ GAS接続エラー: ' + e.message, 'error');
   }
 }
 
-function renderMembers(list) {
-  const el = document.getElementById('memberList');
-  if (!list.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">メンバーが見つかりません</div></div>';
-    return;
-  }
-  el.innerHTML = list.map(email => {
-    const initials = email.split('@')[0].slice(0,2).toUpperCase();
-    return `<div class="member-item"><div class="member-avatar">${initials}</div><span class="member-email">${email}</span></div>`;
-  }).join('');
-}
+// ─────────────────────────────────────────────
+// MEMBER INPUT & SUGGEST
+// ─────────────────────────────────────────────
+function setupMemberInput() {
+  const input = document.getElementById('memberInput');
+  const dropdown = document.getElementById('suggestDropdown');
 
-// ─── SEARCH SLOTS ─────────────────────────────────────────
-async function searchSlots() {
-  const btn = document.getElementById('searchBtn');
-  btn.classList.add('loading');
-  btn.disabled = true;
-  document.getElementById('searchBtnText').textContent = '検索中…';
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    suggestIndex = -1;
+    if (!q) { dropdown.classList.remove('open'); return; }
 
-  if (!gasUrl) {
-    showToast('⚠️ GAS未接続 — デモデータを表示中', 'info');
-    demoSearch();
-    btn.classList.remove('loading');
-    btn.disabled = false;
-    document.getElementById('searchBtnText').textContent = '空き時間を検索';
-    return;
-  }
+    const filtered = allMembers.filter(m =>
+      !selectedMembers.includes(m.email) &&
+      (m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q))
+    );
 
-  try {
-    const params = new URLSearchParams({
-      action: 'slots',
-      duration: selectedDuration,
-      emails: members.join(',')
+    if (filtered.length === 0) {
+      dropdown.classList.remove('open');
+      return;
+    }
+
+    dropdown.innerHTML = filtered.slice(0, 8).map((m, i) => `
+      <div class="suggest-item" data-email="${m.email}" data-index="${i}">
+        <div class="suggest-avatar">${getInitials(m.name)}</div>
+        <div class="suggest-info">
+          <div class="suggest-name">${highlightMatch(m.name, q)}</div>
+          <div class="suggest-email">${highlightMatch(m.email, q)}</div>
+        </div>
+      </div>
+    `).join('');
+
+    dropdown.querySelectorAll('.suggest-item').forEach(el => {
+      el.addEventListener('click', () => selectMember(el.dataset.email));
     });
-    const res = await fetch(gasUrl + '?' + params.toString());
-    const data = await res.json();
+    dropdown.classList.add('open');
+  });
 
-    const searched = data.searched ? `（${data.searched}名対象）` : '';
-    if (data.status === 'success') {
-      slots = (data.slots || []).slice(0, 3);
+  // Keyboard navigation
+  input.addEventListener('keydown', (e) => {
+    const items = dropdown.querySelectorAll('.suggest-item');
+    if (!dropdown.classList.contains('open') || items.length === 0) return;
 
-      if (data.members && data.members.length) {
-        members = data.members;
-        renderMembers(members);
-        document.getElementById('memberCount').textContent = members.length;
-      }
-
-      document.getElementById('slotCount').textContent = slots.length;
-      setLastSync();
-      updateConnectionBadge(true);
-
-      if (slots.length === 0) {
-        showToast(`空き時間が見つかりませんでした ${searched}`, 'info');
-      } else {
-        showToast(`✅ ${slots.length}件の空き枠が見つかりました ${searched}`, 'success');
-      }
-
-      renderSlots(slots);
-    } else {
-      throw new Error(data.message || 'GASエラー');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      suggestIndex = Math.min(suggestIndex + 1, items.length - 1);
+      updateSuggestHighlight(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      suggestIndex = Math.max(suggestIndex - 1, 0);
+      updateSuggestHighlight(items);
+    } else if (e.key === 'Enter' && suggestIndex >= 0) {
+      e.preventDefault();
+      items[suggestIndex]?.click();
+    } else if (e.key === 'Escape') {
+      dropdown.classList.remove('open');
     }
-  } catch(e) {
-    showToast('⚠️ GAS未接続 — デモデータを表示中', 'info');
-    demoSearch();
-  } finally {
-    btn.classList.remove('loading');
-    btn.disabled = false;
-    document.getElementById('searchBtnText').textContent = '空き時間を検索';
-  }
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.member-input-wrap')) {
+      dropdown.classList.remove('open');
+    }
+  });
 }
 
-// ─── DEMO SEARCH ──────────────────────────────────────────
-function demoSearch() {
-  const base = new Date();
-  base.setDate(base.getDate() + 1);
-  base.setHours(10, 0, 0, 0);
-  const d = selectedDuration;
-
-  slots = [
-    buildDemoSlot(base, 0, 10, 0, d),
-    buildDemoSlot(base, 1, 14, 0, d),
-    buildDemoSlot(base, 3, 9, 30, d),
-  ];
-
-  document.getElementById('slotCount').textContent = slots.length;
-  setLastSync();
-  renderSlots(slots);
+function updateSuggestHighlight(items) {
+  items.forEach((el, i) => el.classList.toggle('active', i === suggestIndex));
 }
 
-function buildDemoSlot(base, dayOffset, hour, min, durMin) {
-  const start = new Date(base);
-  start.setDate(start.getDate() + dayOffset);
-  start.setHours(hour, min, 0, 0);
-  const end = new Date(start.getTime() + durMin * 60000);
-  return {
-    start: start.toISOString(),
-    end: end.toISOString(),
-    score: Math.floor(Math.random() * 40) + 60
-  };
+function selectMember(email) {
+  if (selectedMembers.includes(email)) return;
+  selectedMembers.push(email);
+  document.getElementById('memberInput').value = '';
+  document.getElementById('suggestDropdown').classList.remove('open');
+  renderChips();
 }
 
-function renderSlots(list) {
-  const el = document.getElementById('slotList');
-  if (!list.length) {
-    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-text">空き枠が見つかりませんでした</div></div>';
-    return;
-  }
-  const days = ['日','月','火','水','木','金','土'];
-  const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+function removeMember(email) {
+  selectedMembers = selectedMembers.filter(e => e !== email);
+  renderChips();
+}
 
-  el.innerHTML = list.map(s => {
-    const st = new Date(s.start);
-    const en = new Date(s.end);
-    const score = s.score || Math.floor(Math.random() * 40) + 60;
-    const scoreClass = score >= 80 ? 'high' : score >= 60 ? 'mid' : 'low';
-    const durMin = Math.round((en - st) / 60000);
+function renderChips() {
+  const container = document.getElementById('memberChips');
+  container.innerHTML = selectedMembers.map(email => {
+    const m = allMembers.find(x => x.email === email) || { name: email.split('@')[0], email };
     return `
-      <div class="slot-item" onclick="copySlot(this, '${st.toISOString()}')">
-        <div class="slot-day">
-          <div class="slot-day-name">${days[st.getDay()]}</div>
-          <div class="slot-day-num">${st.getDate()}</div>
-          <div class="slot-day-mon">${months[st.getMonth()]}</div>
-        </div>
-        <div class="slot-info">
-          <div class="slot-time">${fmt(st)} 〜 ${fmt(en)}</div>
-          <div class="slot-meta">${durMin}分間 ・ ${members.length}名全員OK</div>
-        </div>
-        <div class="slot-score ${scoreClass}">${score}%</div>
+      <div class="member-chip">
+        <div class="chip-avatar">${getInitials(m.name)}</div>
+        <span>${m.name}</span>
+        <span class="chip-remove" onclick="removeMember('${email}')">✕</span>
       </div>
     `;
   }).join('');
+  document.getElementById('memberCount').textContent = selectedMembers.length + '名';
 }
 
-function fmt(d) {
-  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+// ─────────────────────────────────────────────
+// SEARCH SLOTS
+// ─────────────────────────────────────────────
+async function searchSlots() {
+  if (selectedMembers.length === 0) {
+    showToast('⚠️ 参加者を選択してください', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('searchBtn');
+  const slotList = document.getElementById('slotList');
+  btn.disabled = true;
+  btn.innerHTML = '🔄 検索中...';
+  slotList.innerHTML = '<div class="loading">空き枠を検索しています...</div>';
+
+  try {
+    const duration = document.getElementById('durationSelect').value;
+    const params = new URLSearchParams({
+      action: 'slots',
+      duration: duration,
+      emails: selectedMembers.join(',')
+    });
+    const res = await fetch(GAS_URL + '?' + params.toString());
+    const data = await res.json();
+
+    if (data.status === 'success') {
+      const slots = (data.slots || []).slice(0, 5);
+      document.getElementById('slotCount').textContent = slots.length + '件';
+
+      if (slots.length === 0) {
+        slotList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">😔</div>
+            <div class="empty-state-text">空き枠が見つかりませんでした</div>
+          </div>`;
+      } else {
+        renderSlots(slots);
+      }
+      updateConnectionBadge(true);
+    } else {
+      throw new Error(data.message || '検索エラー');
+    }
+  } catch (e) {
+    slotList.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">⚠️</div>
+        <div class="empty-state-text">エラー: ${e.message}</div>
+      </div>`;
+    updateConnectionBadge(false);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🔍 空き枠を検索';
+  }
+}
+
+// ─────────────────────────────────────────────
+// RENDER SLOTS
+// ─────────────────────────────────────────────
+function renderSlots(slots) {
+  const el = document.getElementById('slotList');
+  el.innerHTML = '<div class="result-list">' + slots.map(slot => {
+    const start = new Date(slot.start);
+    const end = new Date(slot.end);
+    const dateStr = `${start.getMonth()+1}/${start.getDate()}(${['日','月','火','水','木','金','土'][start.getDay()]})`;
+    const timeStr = `${fmt(start)} 〜 ${fmt(end)}`;
+    const score = slot.score != null ? slot.score : '';
+    return `
+      <div class="slot-card" onclick="copySlot(this, '${slot.start}')">
+        <div>
+          <div class="slot-date">${dateStr}</div>
+          <div class="slot-time">${timeStr}</div>
+        </div>
+        ${score ? `<div class="slot-score">${score}点</div>` : ''}
+      </div>`;
+  }).join('') + '</div>';
 }
 
 function copySlot(el, iso) {
@@ -572,48 +523,45 @@ function copySlot(el, iso) {
   }).catch(() => {});
 }
 
-// ─── SUGGEST ──────────────────────────────────────────────
-async function suggestSlots() {
-  const input = document.getElementById('suggestInput').value.trim();
-  if (!input) { showToast('テキストを入力してください', 'error'); return; }
+// ─────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────
+function fmt(d) {
+  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+}
 
-  const resultEl = document.getElementById('suggestResult');
-  resultEl.innerHTML = '<div style="text-align:center;color:var(--text-3);font-size:13px;padding:10px">🔄 分析中…</div>';
+function getInitials(name) {
+  if (!name) return '?';
+  const parts = name.replace(/[^\w\s\u3000-\u9FFF]/g, '').trim().split(/[\s\u3000]+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return name.substring(0, 2).toUpperCase();
+}
 
-  if (!gasUrl) {
-    resultEl.innerHTML = '<div style="padding:10px;font-size:13px;color:var(--text-2)">GAS未接続のため、デモ結果を表示します:<br>→ 来週月曜 14:00-15:00 がおすすめです（全員空き）</div>';
-    return;
-  }
+function highlightMatch(text, query) {
+  if (!query) return text;
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return text;
+  return text.substring(0, idx) + '<b style="color:var(--blue)">' + text.substring(idx, idx + query.length) + '</b>' + text.substring(idx + query.length);
+}
 
-  try {
-    const params = new URLSearchParams({ action: 'suggest', query: input, duration: selectedDuration });
-    const res = await fetch(gasUrl + '?' + params.toString());
-    const data = await res.json();
-    if (data.status === 'success' && data.suggestion) {
-      resultEl.innerHTML = `<div style="padding:10px;font-size:13px;color:var(--text);background:var(--purple-light);border-radius:var(--radius-sm)">${data.suggestion}</div>`;
-    } else {
-      resultEl.innerHTML = `<div style="padding:10px;font-size:13px;color:var(--text-2)">${data.message || '結果がありません'}</div>`;
-    }
-  } catch(e) {
-    resultEl.innerHTML = '<div style="padding:10px;font-size:13px;color:var(--text-2)">⚠️ 接続エラー。GAS URLを確認してください。</div>';
+function updateConnectionBadge(connected) {
+  const badge = document.getElementById('connBadge');
+  if (connected) {
+    badge.className = 'conn-badge ok';
+    badge.textContent = '接続中';
+  } else {
+    badge.className = 'conn-badge err';
+    badge.textContent = '未接続';
   }
 }
 
-// ─── HELPERS ──────────────────────────────────────────────
-function setLastSync() {
-  const now = new Date();
-  document.getElementById('lastSync').textContent = fmt(now);
-}
-
-function showToast(message, type = 'info') {
-  const container = document.getElementById('toastContainer');
-  const toast = document.createElement('div');
-  toast.className = `toast ${type}`;
-  toast.textContent = message;
-  container.appendChild(toast);
-  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s'; }, 2500);
-  setTimeout(() => toast.remove(), 3000);
+function showToast(msg, type) {
+  const el = document.getElementById('toastContainer');
+  el.textContent = msg;
+  el.style.background = type === 'error' ? 'var(--red)' : type === 'success' ? 'var(--text)' : 'var(--yellow)';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
 }
 </script>
 </body>
-          </html>
+</html>
