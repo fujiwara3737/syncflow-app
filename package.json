@@ -1,0 +1,9 @@
+{
+  "name": "syncflow-app",
+  "version": "3.0.0",
+  "description": "SyncFlow - Group Calendar Scheduling App for Google Workspace",
+  "private": true,
+  "scripts": {
+    "start": "npx serve public"
+  }
+}
