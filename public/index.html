@@ -334,7 +334,7 @@ body{
 
 <script>
 // âââ STATE âââââââââââââââââââââââââââââââââââââââââââââââââ
-let gasUrl = localStorage.getItem('syncflow_gas_url') || '';
+let gasUrl = localStorage.getItem('syncflow_gas_url') || 'https://script.google.com/macros/s/AKfycbz2sbiHWYiqxgxBMUwIuwPOGj4LdDgHUZDhIDgi7vI_7xCW7tNFShM5LncBlbwb7yI96Q/exec';
 let members = [];
 let slots = [];
 let selectedDuration = 60;
@@ -617,3 +617,623 @@ function showToast(message, type = 'info') {
 </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SyncFlow v3 for Google</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ââ RESET & VARIABLES ââ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f9fb; --surface:#fff; --surface-2:#f1f3f5; --surface-3:#e9ecef;
+  --text:#1a1d23; --text-2:#4a5060; --text-3:#8890a0;
+  --blue:#1a73e8; --blue-light:#e8f0fe; --green:#0f9d58; --green-light:#e6f4ea;
+  --red:#d93025; --red-light:#fce8e6; --yellow:#f9ab00; --yellow-light:#fef7e0;
+  --purple:#7c3aed; --purple-light:#ede9fe;
+  --border:#dee2e8; --radius:12px; --radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.1),0 4px 10px rgba(0,0,0,.06);
+}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  background:var(--bg); color:var(--text);
+  min-height:100vh; line-height:1.6;
+}
+
+/* ââ LAYOUT ââ */
+.app-container{max-width:520px;margin:0 auto;padding:16px 16px 100px}
+
+/* ââ HEADER ââ */
+.header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 0;margin-bottom:20px;
+}
+.header-left{display:flex;align-items:center;gap:10px}
+.header-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:16px;font-weight:700;
+}
+.header-title{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.header-title span{color:var(--text-3);font-weight:400;font-size:13px;margin-left:4px}
+.connection-badge{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;
+  background:var(--red-light);color:var(--red);transition:all .3s;
+}
+.connection-badge.connected{background:var(--green-light);color:var(--green)}
+.connection-badge::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:currentColor;
+}
+
+/* ââ CARDS ââ */
+.card{
+  background:var(--surface);border-radius:var(--radius);
+  padding:20px;margin-bottom:14px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+}
+.card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.card-title{font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.6px}
+.card-count{
+  background:var(--blue-light);color:var(--blue);
+  padding:2px 10px;border-radius:20px;font-size:12px;font-weight:700;
+}
+
+/* ââ STATS ROW ââ */
+.stats-row{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;
+}
+.stat-item{
+  background:var(--surface-2);border-radius:var(--radius-sm);
+  padding:12px;text-align:center;
+}
+.stat-value{font-size:22px;font-weight:700;color:var(--blue);line-height:1}
+.stat-label{font-size:10px;color:var(--text-3);margin-top:4px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+
+/* ââ MEMBERS ââ */
+.member-list{display:flex;flex-direction:column;gap:6px}
+.member-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;border-radius:var(--radius-sm);
+  background:var(--surface-2);font-size:13px;
+  transition:background .2s;
+}
+.member-item:hover{background:var(--surface-3)}
+.member-avatar{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:11px;font-weight:700;flex-shrink:0;
+}
+.member-email{color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ââ DURATION SELECTOR ââ */
+.duration-selector{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.dur-btn{
+  padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);
+  background:var(--surface);font-size:12px;font-weight:600;
+  color:var(--text-2);cursor:pointer;transition:all .2s;
+  font-family:inherit;
+}
+.dur-btn:hover{border-color:var(--blue);color:var(--blue)}
+.dur-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* ââ SEARCH BUTTON ââ */
+.search-btn{
+  width:100%;padding:14px;border:none;border-radius:var(--radius);
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  color:#fff;font-size:15px;font-weight:700;cursor:pointer;
+  font-family:inherit;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.search-btn:hover{transform:translateY(-1px);box-shadow:var(--shadow-lg)}
+.search-btn:active{transform:translateY(0)}
+.search-btn.loading{opacity:.7;pointer-events:none}
+.search-btn.loading .btn-icon{animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ââ SLOT RESULTS ââ */
+.slot-list{display:flex;flex-direction:column;gap:8px}
+.slot-item{
+  display:flex;align-items:center;gap:12px;
+  padding:14px;border-radius:var(--radius-sm);
+  border:1.5px solid var(--border);background:var(--surface);
+  transition:all .2s;cursor:pointer;
+}
+.slot-item:hover{border-color:var(--blue);background:var(--blue-light)}
+.slot-day{
+  text-align:center;min-width:44px;
+}
+.slot-day-name{font-size:10px;color:var(--text-3);font-weight:600;text-transform:uppercase}
+.slot-day-num{font-size:20px;font-weight:700;color:var(--text);line-height:1.1}
+.slot-day-mon{font-size:10px;color:var(--text-3)}
+.slot-info{flex:1}
+.slot-time{font-size:14px;font-weight:700;color:var(--text)}
+.slot-meta{font-size:11px;color:var(--text-3);margin-top:2px}
+.slot-score{
+  font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;
+}
+.slot-score.high{background:var(--green-light);color:var(--green)}
+.slot-score.mid{background:var(--yellow-light);color:var(--yellow)}
+.slot-score.low{background:var(--red-light);color:var(--red)}
+
+/* ââ SUGGEST INPUT ââ */
+.suggest-section{margin-top:14px}
+.suggest-input-row{display:flex;gap:8px;margin-bottom:10px}
+.suggest-input{
+  flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);
+  font-size:13px;font-family:inherit;background:var(--surface);color:var(--text);
+  outline:none;transition:border-color .2s;
+}
+.suggest-input:focus{border-color:var(--blue)}
+.suggest-btn{
+  padding:10px 16px;border:none;border-radius:var(--radius-sm);
+  background:var(--purple);color:#fff;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .2s;
+}
+.suggest-btn:hover{opacity:.9}
+
+/* ââ TOAST ââ */
+.toast-container{
+  position:fixed;top:16px;left:50%;transform:translateX(-50%);
+  z-index:9999;display:flex;flex-direction:column;gap:8px;
+  pointer-events:none;
+}
+.toast{
+  padding:10px 18px;border-radius:var(--radius-sm);
+  font-size:13px;font-weight:500;pointer-events:auto;
+  animation:toastIn .3s ease;box-shadow:var(--shadow-lg);
+  max-width:360px;text-align:center;
+}
+.toast.success{background:var(--green);color:#fff}
+.toast.error{background:var(--red);color:#fff}
+.toast.info{background:var(--text);color:#fff}
+@keyframes toastIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ââ SETTINGS SECTION ââ */
+.settings-toggle{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 14px;border-radius:var(--radius-sm);
+  background:var(--surface-2);font-size:12px;color:var(--text-2);
+  cursor:pointer;border:none;font-family:inherit;font-weight:500;
+  width:100%;text-align:left;transition:background .2s;
+}
+.settings-toggle:hover{background:var(--surface-3)}
+.settings-panel{
+  display:none;margin-top:10px;padding:14px;
+  background:var(--surface-2);border-radius:var(--radius-sm);
+}
+.settings-panel.open{display:block}
+.settings-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.settings-row label{font-size:12px;color:var(--text-2);font-weight:500;min-width:70px}
+.settings-row input{
+  flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:6px;
+  font-size:12px;font-family:'DM Mono',monospace;background:var(--surface);
+  color:var(--text);outline:none;
+}
+.settings-row input:focus{border-color:var(--blue)}
+.save-url-btn{
+  margin-top:8px;padding:8px 16px;border:none;border-radius:6px;
+  background:var(--blue);color:#fff;font-size:12px;font-weight:600;
+  cursor:pointer;font-family:inherit;
+}
+
+/* ââ FOOTER ââ */
+.footer-note{
+  font-size:11px;color:var(--text-3);text-align:center;
+  margin-top:10px;line-height:1.5;
+}
+
+/* ââ EMPTY STATE ââ */
+.empty-state{
+  text-align:center;padding:30px 20px;color:var(--text-3);
+}
+.empty-state-icon{font-size:36px;margin-bottom:8px}
+.empty-state-text{font-size:13px}
+
+/* ââ RESPONSIVE ââ */
+@media(max-width:400px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .duration-selector{gap:4px}
+  .dur-btn{padding:5px 10px;font-size:11px}
+}
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="header-icon">S</div>
+      <span class="header-title">SyncFlow <span>v3</span></span>
+    </div>
+    <div class="connection-badge" id="connBadge">æªæ¥ç¶</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-item">
+      <div class="stat-value" id="memberCount">0</div>
+      <div class="stat-label">ã¡ã³ãã¼</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="slotCount">0</div>
+      <div class="stat-label">ç©ºãæ </div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-value" id="lastSync">--</div>
+      <div class="stat-label">æçµåæ</div>
+    </div>
+  </div>
+
+  <!-- MEMBERS CARD -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">ã¡ã³ãã¼</span>
+      <button class="save-url-btn" id="refreshMembersBtn" style="margin:0;padding:4px 12px;font-size:11px">ð æ´æ°</button>
+    </div>
+    <div class="member-list" id="memberList">
+      <div class="empty-state">
+        <div class="empty-state-icon">ð¥</div>
+        <div class="empty-state-text">GAS URLãè¨­å®ãã¦ã¡ã³ãã¼ãèª­ã¿è¾¼ã¿</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEARCH CARD -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">ç©ºãæéãæ¤ç´¢</span>
+    </div>
+
+    <!-- Duration Selector -->
+    <div class="duration-selector" id="durationSelector">
+      <button class="dur-btn" data-dur="30">30å</button>
+      <button class="dur-btn active" data-dur="60">1æé</button>
+      <button class="dur-btn" data-dur="90">1.5æé</button>
+      <button class="dur-btn" data-dur="120">2æé</button>
+    </div>
+
+    <!-- Search Button -->
+    <button class="search-btn" id="searchBtn" onclick="searchSlots()">
+      <span class="btn-icon">ð</span>
+      <span id="searchBtnText">ç©ºãæéãæ¤ç´¢</span>
+    </button>
+
+    <!-- Slot Results -->
+    <div style="margin-top:14px">
+      <div class="slot-list" id="slotList">
+        <div class="empty-state">
+          <div class="empty-state-icon">ð</div>
+          <div class="empty-state-text">æ¤ç´¢ãã¿ã³ãæ¼ãã¦ç©ºãæ ãæ¢ã</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUGGEST CARD -->
+  <div class="card suggest-section">
+    <div class="card-header">
+      <span class="card-title">ãµã¸ã§ã¹ãæ©è½</span>
+    </div>
+    <div class="suggest-input-row">
+      <input class="suggest-input" id="suggestInput" placeholder="ä¾: æ¥é±ã®ææåå¾ã«ä¼è­°ãå¥ããã" />
+      <button class="suggest-btn" id="suggestBtn" onclick="suggestSlots()">ææ¡</button>
+    </div>
+    <div id="suggestResult"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="card">
+    <button class="settings-toggle" onclick="toggleSettings()">âï¸ GAS URLè¨­å®</button>
+    <div class="settings-panel" id="settingsPanel">
+      <div class="settings-row">
+        <label>GAS URL</label>
+        <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/..." />
+      </div>
+      <button class="save-url-btn" onclick="saveGasUrl()">ä¿å­ãã¦æ¥ç¶</button>
+      <div class="footer-note">â» GAS v3 Webã¢ããªã®URLãå¥åãã¦ãã ãããCalendar Advanced Serviceãæå¹ã«ããã¨ãåä¸Workspaceã®ã¡ã³ãã¼ãèªååå¾ã§ãã¾ãã</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// âââ STATE âââââââââââââââââââââââââââââââââââââââââââââââââ
+let gasUrl = localStorage.getItem('syncflow_gas_url') || 'https://script.google.com/macros/s/AKfycbz2sbiHWYiqxgxBMUwIuwPOGj4LdDgHUZDhIDgi7vI_7xCW7tNFShM5LncBlbwb7yI96Q/exec';
+let members = [];
+let slots = [];
+let selectedDuration = 60;
+
+// âââ INIT ââââââââââââââââââââââââââââââââââââââââââââââââââ
+(function init() {
+  document.getElementById('gasUrlInput').value = gasUrl;
+  if (gasUrl) {
+    updateConnectionBadge(true);
+    fetchMembers();
+  }
+
+  // Duration selector
+  document.querySelectorAll('.dur-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedDuration = parseInt(btn.dataset.dur);
+    });
+  });
+
+  document.getElementById('refreshMembersBtn').addEventListener('click', fetchMembers);
+
+  // Suggest enter key
+  document.getElementById('suggestInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') suggestSlots();
+  });
+})();
+
+// âââ GAS URL MANAGEMENT âââââââââââââââââââââââââââââââââââ
+function saveGasUrl() {
+  const url = document.getElementById('gasUrlInput').value.trim();
+  if (!url) { showToast('URLãå¥åãã¦ãã ãã', 'error'); return; }
+  gasUrl = url;
+  localStorage.setItem('syncflow_gas_url', gasUrl);
+  updateConnectionBadge(true);
+  showToast('â GAS URL ãä¿å­ãã¾ãã', 'success');
+  fetchMembers();
+}
+
+function toggleSettings() {
+  document.getElementById('settingsPanel').classList.toggle('open');
+}
+
+function updateConnectionBadge(connected) {
+  const badge = document.getElementById('connBadge');
+  if (connected) {
+    badge.textContent = 'æ¥ç¶ä¸­';
+    badge.classList.add('connected');
+  } else {
+    badge.textContent = 'æªæ¥ç¶';
+    badge.classList.remove('connected');
+  }
+}
+
+// âââ FETCH MEMBERS ââââââââââââââââââââââââââââââââââââââââ
+async function fetchMembers() {
+  if (!gasUrl) {
+    showToast('åã«GAS URLãä¿å­ãã¦ãã ãã', 'error');
+    return;
+  }
+  const btn = document.getElementById('refreshMembersBtn');
+  btn.disabled = true;
+  btn.innerHTML = 'â³ èª­è½¼ä¸­â¦';
+
+  try {
+    const params = new URLSearchParams({ action: 'members' });
+    const res = await fetch(gasUrl + '?' + params.toString());
+    const data = await res.json();
+
+    if (data.status === 'success') {
+      members = data.members || [];
+      renderMembers(members);
+      document.getElementById('memberCount').textContent = members.length;
+      setLastSync();
+      updateConnectionBadge(true);
+      showToast(`${members.length}åã®ã¡ã³ãã¼ãåå¾ãã¾ãã`, 'success');
+    } else {
+      throw new Error(data.message || 'GASã¨ã©ã¼');
+    }
+  } catch(e) {
+    members = ['tanaka@example.com','sato@example.com','suzuki@example.com'];
+    renderMembers(members);
+    document.getElementById('memberCount').textContent = members.length;
+    setLastSync();
+    showToast('â ï¸ ãã¢ãã¼ã¿ãè¡¨ç¤ºä¸­ (GASæªæ¥ç¶)', 'info');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'ð æ´æ°';
+  }
+}
+
+function renderMembers(list) {
+  const el = document.getElementById('memberList');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">ð¥</div><div class="empty-state-text">ã¡ã³ãã¼ãè¦ã¤ããã¾ãã</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(email => {
+    const initials = email.split('@')[0].slice(0,2).toUpperCase();
+    return `<div class="member-item"><div class="member-avatar">${initials}</div><span class="member-email">${email}</span></div>`;
+  }).join('');
+}
+
+// âââ SEARCH SLOTS âââââââââââââââââââââââââââââââââââââââââ
+async function searchSlots() {
+  const btn = document.getElementById('searchBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  document.getElementById('searchBtnText').textContent = 'æ¤ç´¢ä¸­â¦';
+
+  if (!gasUrl) {
+    showToast('â ï¸ GASæªæ¥ç¶ â ãã¢ãã¼ã¿ãè¡¨ç¤ºä¸­', 'info');
+    demoSearch();
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    document.getElementById('searchBtnText').textContent = 'ç©ºãæéãæ¤ç´¢';
+    return;
+  }
+
+  try {
+    const params = new URLSearchParams({
+      action: 'slots',
+      duration: selectedDuration,
+      emails: members.join(',')
+    });
+    const res = await fetch(gasUrl + '?' + params.toString());
+    const data = await res.json();
+
+    const searched = data.searched ? `ï¼${data.searched}åå¯¾è±¡ï¼` : '';
+    if (data.status === 'success') {
+      slots = (data.slots || []).slice(0, 3);
+
+      if (data.members && data.members.length) {
+        members = data.members;
+        renderMembers(members);
+        document.getElementById('memberCount').textContent = members.length;
+      }
+
+      document.getElementById('slotCount').textContent = slots.length;
+      setLastSync();
+      updateConnectionBadge(true);
+
+      if (slots.length === 0) {
+        showToast(`ç©ºãæéãè¦ã¤ããã¾ããã§ãã ${searched}`, 'info');
+      } else {
+        showToast(`â ${slots.length}ä»¶ã®ç©ºãæ ãè¦ã¤ããã¾ãã ${searched}`, 'success');
+      }
+
+      renderSlots(slots);
+    } else {
+      throw new Error(data.message || 'GASã¨ã©ã¼');
+    }
+  } catch(e) {
+    showToast('â ï¸ GASæªæ¥ç¶ â ãã¢ãã¼ã¿ãè¡¨ç¤ºä¸­', 'info');
+    demoSearch();
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    document.getElementById('searchBtnText').textContent = 'ç©ºãæéãæ¤ç´¢';
+  }
+}
+
+// âââ DEMO SEARCH ââââââââââââââââââââââââââââââââââââââââââ
+function demoSearch() {
+  const base = new Date();
+  base.setDate(base.getDate() + 1);
+  base.setHours(10, 0, 0, 0);
+  const d = selectedDuration;
+
+  slots = [
+    buildDemoSlot(base, 0, 10, 0, d),
+    buildDemoSlot(base, 1, 14, 0, d),
+    buildDemoSlot(base, 3, 9, 30, d),
+  ];
+
+  document.getElementById('slotCount').textContent = slots.length;
+  setLastSync();
+  renderSlots(slots);
+}
+
+function buildDemoSlot(base, dayOffset, hour, min, durMin) {
+  const start = new Date(base);
+  start.setDate(start.getDate() + dayOffset);
+  start.setHours(hour, min, 0, 0);
+  const end = new Date(start.getTime() + durMin * 60000);
+  return {
+    start: start.toISOString(),
+    end: end.toISOString(),
+    score: Math.floor(Math.random() * 40) + 60
+  };
+}
+
+function renderSlots(list) {
+  const el = document.getElementById('slotList');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">ð</div><div class="empty-state-text">ç©ºãæ ãè¦ã¤ããã¾ããã§ãã</div></div>';
+    return;
+  }
+  const days = ['æ¥','æ','ç«','æ°´','æ¨','é','å'];
+  const months = ['1æ','2æ','3æ','4æ','5æ','6æ','7æ','8æ','9æ','10æ','11æ','12æ'];
+
+  el.innerHTML = list.map(s => {
+    const st = new Date(s.start);
+    const en = new Date(s.end);
+    const score = s.score || Math.floor(Math.random() * 40) + 60;
+    const scoreClass = score >= 80 ? 'high' : score >= 60 ? 'mid' : 'low';
+    const durMin = Math.round((en - st) / 60000);
+    return `
+      <div class="slot-item" onclick="copySlot(this, '${st.toISOString()}')">
+        <div class="slot-day">
+          <div class="slot-day-name">${days[st.getDay()]}</div>
+          <div class="slot-day-num">${st.getDate()}</div>
+          <div class="slot-day-mon">${months[st.getMonth()]}</div>
+        </div>
+        <div class="slot-info">
+          <div class="slot-time">${fmt(st)} ã ${fmt(en)}</div>
+          <div class="slot-meta">${durMin}åé ã» ${members.length}åå¨å¡OK</div>
+        </div>
+        <div class="slot-score ${scoreClass}">${score}%</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function fmt(d) {
+  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+}
+
+function copySlot(el, iso) {
+  const d = new Date(iso);
+  const text = `${d.getMonth()+1}/${d.getDate()} ${fmt(d)}ã`;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(`ð ã³ãã¼ãã¾ãã: ${text}`, 'success');
+  }).catch(() => {});
+}
+
+// âââ SUGGEST ââââââââââââââââââââââââââââââââââââââââââââââ
+async function suggestSlots() {
+  const input = document.getElementById('suggestInput').value.trim();
+  if (!input) { showToast('ãã­ã¹ããå¥åãã¦ãã ãã', 'error'); return; }
+
+  const resultEl = document.getElementById('suggestResult');
+  resultEl.innerHTML = '<div style="text-align:center;color:var(--text-3);font-size:13px;padding:10px">ð åæä¸­â¦</div>';
+
+  if (!gasUrl) {
+    resultEl.innerHTML = '<div style="padding:10px;font-size:13px;color:var(--text-2)">GASæªæ¥ç¶ã®ããããã¢çµæãè¡¨ç¤ºãã¾ã:<br>â æ¥é±ææ 14:00-15:00 ãããããã§ãï¼å¨å¡ç©ºãï¼</div>';
+    return;
+  }
+
+  try {
+    const params = new URLSearchParams({ action: 'suggest', query: input, duration: selectedDuration });
+    const res = await fetch(gasUrl + '?' + params.toString());
+    const data = await res.json();
+    if (data.status === 'success' && data.suggestion) {
+      resultEl.innerHTML = `<div style="padding:10px;font-size:13px;color:var(--text);background:var(--purple-light);border-radius:var(--radius-sm)">${data.suggestion}</div>`;
+    } else {
+      resultEl.innerHTML = `<div style="padding:10px;font-size:13px;color:var(--text-2)">${data.message || 'çµæãããã¾ãã'}</div>`;
+    }
+  } catch(e) {
+    resultEl.innerHTML = '<div style="padding:10px;font-size:13px;color:var(--text-2)">â ï¸ æ¥ç¶ã¨ã©ã¼ãGAS URLãç¢ºèªãã¦ãã ããã</div>';
+  }
+}
+
+// âââ HELPERS ââââââââââââââââââââââââââââââââââââââââââââââ
+function setLastSync() {
+  const now = new Date();
+  document.getElementById('lastSync').textContent = fmt(now);
+}
+
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s'; }, 2500);
+  setTimeout(() => toast.remove(), 3000);
+}
+</script>
+</body>
+</html>
+h
