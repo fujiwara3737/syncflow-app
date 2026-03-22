@@ -7,512 +7,153 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#f8f9fb;--surface:#fff;--surface-2:#f1f3f5;--surface-3:#e9ecef;
-  --text:#1a1d23;--text-2:#4a5060;--text-3:#8890a0;
-  --blue:#1a73e8;--blue-light:#e8f0fe;
-  --green:#0f9d58;--green-light:#e6f4ea;
-  --red:#d93025;--red-light:#fce8e6;
-  --yellow:#f9ab00;--yellow-light:#fef7e0;
-  --purple:#7c3aed;--purple-light:#ede9fe;
-  --border:#dee2e8;--radius:12px;--radius-sm:8px;
-  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
-  --shadow-lg:0 10px 25px rgba(0,0,0,.1),0 4px 10px rgba(0,0,0,.06);
-}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;}
-.app-header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.app-header h1{font-size:18px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
-.app-header h1 span{color:var(--blue);}
-.conn-badge{font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500;display:flex;align-items:center;gap:4px;}
-.conn-badge.ok{background:var(--green-light);color:var(--green);}
-.conn-badge.err{background:var(--red-light);color:var(--red);}
-.conn-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;}
-.container{max-width:640px;margin:0 auto;padding:20px 16px 80px;display:flex;flex-direction:column;gap:16px;}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:visible;}
-.card-header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;}
-.card-title{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;}
-.card-body{padding:0 20px 20px;}
-.member-section{display:flex;flex-direction:column;gap:12px;}
-.member-input-wrap{position:relative;}
-.member-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;background:var(--surface);}
-.member-input:focus{border-color:var(--blue);}
-.member-input::placeholder{color:var(--text-3);}
-.suggest-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);max-height:240px;overflow-y:auto;z-index:200;display:none;margin-top:4px;}
-.suggest-dropdown.open{display:block;}
-.suggest-item{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:background .15s;}
-.suggest-item:hover,.suggest-item.active{background:var(--surface-2);}
-.suggest-avatar{width:36px;height:36px;border-radius:50%;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0;}
-.suggest-info{flex:1;min-width:0;}
-.suggest-name{font-size:14px;font-weight:500;color:var(--text);white-space:nowrap;overflow:visible;text-overflow:ellipsis;}
-.suggest-email{font-size:12px;color:var(--text-3);white-space:nowrap;overflow:visible;text-overflow:ellipsis;}
-.member-chips{display:flex;flex-wrap:wrap;gap:6px;}
-.member-chip{display:inline-flex;align-items:center;gap:6px;background:var(--blue-light);color:var(--blue);padding:4px 10px 4px 6px;border-radius:20px;font-size:13px;font-weight:500;}
-.member-chip .chip-avatar{width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;}
-.member-chip .chip-remove{cursor:pointer;opacity:.6;font-size:16px;line-height:1;transition:opacity .15s;}
-.member-chip .chip-remove:hover{opacity:1;}
-.search-controls{display:flex;flex-direction:column;gap:12px;}
-.control-row{display:flex;gap:10px;align-items:center;}
-.control-row label{font-size:13px;color:var(--text-2);white-space:nowrap;min-width:60px;}
-.control-row select,.control-row input[type="number"]{flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;background:var(--surface);outline:none;}
-.control-row select:focus,.control-row input:focus{border-color:var(--blue);}
-.search-btn{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .2s;}
-.search-btn:hover{background:#1557b0;}
-.search-btn:disabled{background:var(--text-3);cursor:not-allowed;}
-.result-list{display:flex;flex-direction:column;gap:8px;}
-.slot-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;transition:all .2s;}
-.slot-card:hover{border-color:var(--blue);background:var(--blue-light);}
-.slot-date{font-size:14px;font-weight:500;}
-.slot-time{font-size:13px;color:var(--text-2);}
-.slot-actions{display:flex;gap:6px;align-items:center;}
-.btn-copy{padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);transition:background .15s;}
-.btn-copy:hover{background:var(--surface-3);}
-.btn-meet{padding:5px 12px;border:none;border-radius:6px;background:var(--blue);color:#fff;cursor:pointer;font-size:12px;font-weight:500;transition:opacity .15s;}
-.btn-meet:hover{opacity:.9;}
-.btn-meet:disabled{background:var(--text-3);cursor:not-allowed;}
-.copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
-.copy-toast.show{opacity:1;}
-.empty-state{text-align:center;padding:32px 16px;color:var(--text-3);}
-.empty-state-icon{font-size:32px;margin-bottom:8px;}
-.empty-state-text{font-size:13px;}
-.loading{text-align:center;padding:24px;color:var(--text-3);font-size:13px;}
-.loading::before{content:'';display:block;width:24px;height:24px;margin:0 auto 8px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.success-card{background:linear-gradient(135deg,#e8f5e9 0%,#f1f8e9 100%);border:1px solid #a5d6a7;border-radius:var(--radius);padding:24px;text-align:center;}
-.success-card h3{font-size:18px;font-weight:600;color:#2e7d32;margin-bottom:4px;}
-.success-card .detail-box{background:var(--surface);border-radius:var(--radius-sm);padding:16px;text-align:left;margin-top:16px;}
-.btn-meet-link{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#1a73e8;color:#fff;border-radius:6px;text-decoration:none;font-size:13px;font-weight:500;margin-top:12px;}
-.btn-meet-link:hover{opacity:.9;}
-.btn-cal-link{color:var(--blue);font-size:13px;text-decoration:none;margin-top:8px;display:inline-block;}
-</style>
-</head>
-<body>
-<header class="app-header">
-  <h1>📅 <span>SyncFlow</span> v3</h1>
-  <div class="conn-badge err" id="connBadge">未接続</div>
-</header>
-<div class="container">
-  <div class="card">
-    <div class="card-header">
-      <span class="card-title">👥 参加者</span>
-      <span id="memberCount" style="font-size:12px;color:var(--text-3)">0名</span>
-    </div>
-    <div class="card-body member-section">
-      <div id="memberChips" class="member-chips"></div>
-      <div class="member-input-wrap">
-        <input type="text" class="member-input" id="memberInput" placeholder="名前またはメールで検索..." autocomplete="off">
-        <div class="suggest-dropdown" id="suggestDropdown"></div>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-header"><span class="card-title">🔍 空き枠を探す</span></div>
-    <div class="card-body search-controls">
-      <div class="control-row">
-        <label>所要時間</label>
-        <select id="durationSelect">
-          <option value="30">30分</option>
-          <option value="60" selected>60分</option>
-          <option value="90">90分</option>
-          <option value="120">120分</option>
-        </select>
-      </div>
-      <button class="search-btn" id="searchBtn" onclick="searchSlots()">🔍 空き枠を検索</button>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-header">
-      <span class="card-title">📋 検索結果</span>
-      <span id="slotCount" style="font-size:12px;color:var(--text-3)"></span>
-    </div>
-    <div class="card-body">
-      <div id="slotList">
-        <div class="empty-state">
-          <div class="empty-state-icon">📭</div>
-          <div class="empty-state-text">参加者を選んで検索ボタンを押してください</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="copy-toast" id="toastContainer"></div>
-<script>
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzYAXR5n8_H_96v2Sv6YppUdSEB0-hBFx6K0KZozrAgWMdmYu7a66dWXmPrCtyO2w0b7g/exec';
-let allMembers = [];
-let selectedMembers = [];
-let suggestIndex = -1;
-let currentSlots = [];
-
-document.addEventListener('DOMContentLoaded', () => {
-  fetchMembers();
-  setupMemberInput();
-});
-
-async function fetchMembers() {
-  try {
-    const params = new URLSearchParams({ action: 'members' });
-    const res = await fetch(GAS_URL + '?' + params.toString());
-    const data = await res.json();
-    if (data.status === 'success' && data.members) {
-      allMembers = data.members.map(m => {
-        if (typeof m === 'string') return { email: m, name: m.split('@')[0] };
-        return { email: m.email || m, name: m.name || m.email?.split('@')[0] || '' };
-      });
-      updateConnectionBadge(true);
-      showToast('✅ ' + allMembers.length + '名のメンバーを取得しました', 'success');
-    } else { throw new Error(data.message || 'failed'); }
-  } catch (e) {
-    updateConnectionBadge(false);
-    showToast('⚠️ GAS error: ' + e.message, 'error');
-  }
-}
-
-function setupMemberInput() {
-  const input = document.getElementById('memberInput');
-  const dropdown = document.getElementById('suggestDropdown');
-  input.addEventListener('input', () => {
-    const q = input.value.trim().toLowerCase();
-    suggestIndex = -1;
-    if (!q) { dropdown.classList.remove('open'); return; }
-    const filtered = allMembers.filter(m => !selectedMembers.includes(m.email) && (m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q)));
-    if (filtered.length === 0) { dropdown.classList.remove('open'); return; }
-    dropdown.innerHTML = filtered.slice(0, 8).map((m, i) => `
-      <div class="suggest-item" data-email="${m.email}" data-index="${i}">
-        <div class="suggest-avatar">${getInitials(m.name)}</div>
-        <div class="suggest-info">
-          <div class="suggest-name">${highlightMatch(m.name, q)}</div>
-          <div class="suggest-email">${highlightMatch(m.email, q)}</div>
-        </div>
-      </div>`).join('');
-    dropdown.querySelectorAll('.suggest-item').forEach(el => {
-      el.addEventListener('click', () => selectMember(el.dataset.email));
-    });
-    dropdown.classList.add('open');
-  });
-  input.addEventListener('keydown', (e) => {
-    const items = dropdown.querySelectorAll('.suggest-item');
-    if (!dropdown.classList.contains('open') || items.length === 0) return;
-    if (e.key === 'ArrowDown') { e.preventDefault(); suggestIndex = Math.min(suggestIndex + 1, items.length - 1); updateSuggestHighlight(items); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); suggestIndex = Math.max(suggestIndex - 1, 0); updateSuggestHighlight(items); }
-    else if (e.key === 'Enter' && suggestIndex >= 0) { e.preventDefault(); items[suggestIndex]?.click(); }
-    else if (e.key === 'Escape') { dropdown.classList.remove('open'); }
-  });
-  document.addEventListener('click', (e) => { if (!e.target.closest('.member-input-wrap')) dropdown.classList.remove('open'); });
-}
-function updateSuggestHighlight(items) { items.forEach((el, i) => el.classList.toggle('active', i === suggestIndex)); }
-function selectMember(email) {
-  if (selectedMembers.includes(email)) return;
-  selectedMembers.push(email);
-  document.getElementById('memberInput').value = '';
-  document.getElementById('suggestDropdown').classList.remove('open');
-  renderChips();
-}
-function removeMember(email) { selectedMembers = selectedMembers.filter(e => e !== email); renderChips(); }
-function renderChips() {
-  const container = document.getElementById('memberChips');
-  container.innerHTML = selectedMembers.map(email => {
-    const m = allMembers.find(x => x.email === email) || { name: email.split('@')[0], email };
-    return `<div class="member-chip"><div class="chip-avatar">${getInitials(m.name)}</div><span>${m.name}</span><span class="chip-remove" onclick="removeMember('${email}')">✕</span></div>`;
-  }).join('');
-  document.getElementById('memberCount').textContent = selectedMembers.length + '名';
-}
-async function searchSlots() {
-  if (selectedMembers.length === 0) { showToast('⚠️ 参加者を選択してください', 'error'); return; }
-  const btn = document.getElementById('searchBtn');
-  const slotList = document.getElementById('slotList');
-  btn.disabled = true; btn.innerHTML = '🔄 検索中...';
-  slotList.innerHTML = '<div class="loading">空き枠を検索しています...</div>';
-  try {
-    const duration = document.getElementById('durationSelect').value;
-    const params = new URLSearchParams({ action: 'slots', duration, emails: selectedMembers.join(',') });
-    const res = await fetch(GAS_URL + '?' + params.toString());
-    const data = await res.json();
-    if (data.status === 'success') {
-      currentSlots = (data.slots || []).slice(0, 5);
-      document.getElementById('slotCount').textContent = currentSlots.length + '件';
-      if (currentSlots.length === 0) {
-        slotList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">😔</div><div class="empty-state-text">空き枠が見つかりませんでした</div></div>';
-      } else { renderSlots(currentSlots); }
-      updateConnectionBadge(true);
-    } else { throw new Error(data.message || 'error'); }
-  } catch (e) {
-    slotList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">エラー: ' + e.message + '</div></div>';
-    updateConnectionBadge(false);
-  } finally { btn.disabled = false; btn.innerHTML = '🔍 空き枠を検索'; }
-}
-function renderSlots(slots) {
-  const el = document.getElementById('slotList');
-  el.innerHTML = '<div class="result-list">' + slots.map((slot, idx) => {
-    const s = new Date(slot.start), e = new Date(slot.end);
-    const ds = (s.getMonth()+1)+'/'+s.getDate()+'('+['日','月','火','水','木','金','土'][s.getDay()]+')';
-    const ts = fmt(s)+' 〜 '+fmt(e);
-    const sc = slot.score!=null?slot.score:'';
-    return `<div class="slot-card"><div><div class="slot-date">${ds}</div><div class="slot-time">${ts}</div></div><div class="slot-actions">${sc?'<span style="font-size:12px;font-weight:600;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:10px;">'+sc+'点</span>':''}<button class="btn-copy" onclick="copySlot(${idx})">📋 コピー</button><button class="btn-meet" id="meetBtn${idx}" onclick="createMeeting(${idx})">📹 ミーティング作成</button></div></div>`;
-  }).join('')+'</div>';
-                }
-async function createMeeting(index) {
-  const slot = currentSlots[index];
-  if (!slot) { showToast('No slot data', 'error'); return; }
-  const title = prompt('ミーティングの件名を入力してください:', 'ミーティング');
-  if (!title) return;
-  const btn = document.getElementById('meetBtn' + index);
-  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ 作成中…'; }
-  try {
-    const res = await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'create', title, start: slot.start, end: slot.end, attendees: selectedMembers, note: '' })
-    });
-    const data = await res.json();
-    if (data.status === 'success') { showMeetingSuccess(data, slot); showToast('🎉 ミーティングを作成しました！', 'success'); }
-    else { showToast('作成エラー: ' + (data.message || ''), 'error'); }
-  } catch (e) { showToast('通信エラー: ' + e.message, 'error'); }
-  finally { if (btn) { btn.disabled = false; btn.innerHTML = '📹 ミーティング作成'; } }
-}
-function showMeetingSuccess(data, slot) {
-  const s = new Date(slot.start), e = new Date(slot.end);
-  const ds = (s.getMonth()+1)+'/'+s.getDate()+'('+['日','月','火','水','木','金','土'][s.getDay()]+')';
-  const ts = fmt(s)+' 〜 '+fmt(e);
-  const el = document.getElementById('slotList');
-  el.innerHTML = `<div class="success-card"><div style="font-size:48px;margin-bottom:12px;">🎉</div><h3>ミーティングを作成しました！</h3><div style="font-size:14px;color:var(--text-2);margin-bottom:4px;">参加者全員に招待メールが送信されました</div><div class="detail-box"><div style="font-weight:600;font-size:16px;margin-bottom:8px;">📌 ${data.summary||''}</div><div style="color:var(--text-2);font-size:13px;">📅 ${ds} ${ts}</div>${data.meetLink?`<div><a href="${data.meetLink}" target="_blank" class="btn-meet-link">📹 Google Meet に参加</a></div>`:''}${data.htmlLink?`<div><a href="${data.htmlLink}" target="_blank" class="btn-cal-link">📎 Googleカレンダーで開く →</a></div>`:''}</div><div style="font-size:12px;color:var(--text-3);margin-top:12px;">${(data.attendees||[]).map(a=>a.email).join(', ')}</div><button onclick="searchSlots()" style="margin-top:16px;padding:8px 20px;background:var(--blue);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;">🔍 もう一度検索</button></div>`;
-}
-function copySlot(index) {
-  const slot = currentSlots[index]; if (!slot) return;
-  const d = new Date(slot.start);
-  const text = (d.getMonth()+1)+'/'+d.getDate()+' '+fmt(d)+'〜';
-  navigator.clipboard.writeText(text).then(() => showToast('📋 コピーしました: '+text, 'success')).catch(()=>{});
-}
-function fmt(d) { return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
-function getInitials(name) { if(!name)return'?';const p=name.replace(/[^\w\s　-鿿]/g,'').trim().split(/[\s　]+/);if(p.length>=2)return(p[0][0]+p[1][0]).toUpperCase();return name.substring(0,2).toUpperCase(); }
-function highlightMatch(text,query) { if(!query)return text;const idx=text.toLowerCase().indexOf(query.toLowerCase());if(idx===-1)return text;return text.substring(0,idx)+'<b style="color:var(--blue)">'+text.substring(idx,idx+query.length)+'</b>'+text.substring(idx+query.length); }
-function updateConnectionBadge(connected) { const b=document.getElementById('connBadge');if(connected){b.className='conn-badge ok';b.textContent='接続中';}else{b.className='conn-badge err';b.textContent='未接続';} }
-function showToast(msg,type) { const el=document.getElementById('toastContainer');el.textContent=msg;el.style.background=type==='error'?'var(--red)':type==='success'?'var(--text)':'var(--yellow)';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500); }
-</script>
-</body>
-</html><!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SyncFlow v3 for Google</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
 /* — RESET & VARIABLES — */
-*,*::before,*::after{box-sizing:border-box;mahhrgin:0;padding:0}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#f8f9fb; --surface:#fff; --surface-2:#f1f3f5; --surface-3:#e9ecef;
   --text:#1a1d23; --text-2:#4a5060; --text-3:#8890a0;
-  --blue:#1a73e8; --blue-light:#e8f0fe; --green:#0f9d58; --green-light:#e6f4ea;
-  --red:#d93025; --red-light:#fce8e6; --yellow:#f9ab00; --yellow-light:#fef7e0;
+  --blue:#1a73e8; --blue-light:#e8f0fe;
+  --green:#0f9d58; --green-light:#e6f4ea;
+  --red:#d93025; --red-light:#fce8e6;
+  --yellow:#f9ab00; --yellow-light:#fef7e0;
   --purple:#7c3aed; --purple-light:#ede9fe;
   --border:#dee2e8; --radius:12px; --radius-sm:8px;
   --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
   --shadow-lg:0 10px 25px rgba(0,0,0,.1),0 4px 10px rgba(0,0,0,.06);
 }
 body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  min-height:100vh;
-  line-height:1.5;
+  font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text);
+  min-height:100vh; line-height:1.5;
 }
 /* — LAYOUT — */
 .app-header{
-  background:var(--surface);
-  border-bottom:1px solid var(--border);
-  padding:16px 24px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
+  background:var(--surface); border-bottom:1px solid var(--border);
+  padding:16px 24px; display:flex; align-items:center; justify-content:space-between;
   position:sticky; top:0; z-index:100;
 }
-.app-header h1{
-  font-size:18px; font-weight:600; color:var(--text);
-  display:flex; align-items:center; gap:8px;
-}
+.app-header h1{ font-size:18px; font-weight:600; color:var(--text); display:flex; align-items:center; gap:8px; }
 .app-header h1 span{ color:var(--blue); }
-.conn-badge{
-  font-size:12px; padding:4px 10px; border-radius:20px;
-  font-weight:500; display:flex; align-items:center; gap:4px;
-}
+.conn-badge{ font-size:12px; padding:4px 10px; border-radius:20px; font-weight:500; display:flex; align-items:center; gap:4px; }
 .conn-badge.ok{ background:var(--green-light); color:var(--green); }
 .conn-badge.err{ background:var(--red-light); color:var(--red); }
 .conn-badge::before{ content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
-
-.container{
-  max-width:640px; margin:0 auto; padding:20px 16px 80px;
-  display:flex; flex-direction:column; gap:16px;
-}
-
+.container{ max-width:640px; margin:0 auto; padding:20px 16px 80px; display:flex; flex-direction:column; gap:16px; }
 /* — CARD — */
-.card{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  box-shadow:var(--shadow);
-  overflow:visible;
-}
-.card-header{
-  padding:16px 20px 12px;
-  display:flex; align-items:center; justify-content:space-between;
-}
-.card-title{
-  font-size:14px; font-weight:600; color:var(--text);
-  display:flex; align-items:center; gap:6px;
-}
+.card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); overflow:visible; }
+.card-header{ padding:16px 20px 12px; display:flex; align-items:center; justify-content:space-between; }
+.card-title{ font-size:14px; font-weight:600; color:var(--text); display:flex; align-items:center; gap:6px; }
 .card-body{ padding:0 20px 20px; }
-
 /* — MEMBERS — */
 .member-section{ display:flex; flex-direction:column; gap:12px; }
-.member-input-wrap{
-  position:relative;
-}
+.member-input-wrap{ position:relative; }
 .member-input{
-  width:100%; padding:10px 14px;
-  border:1.5px solid var(--border);
-  border-radius:var(--radius-sm);
-  font-size:14px; font-family:inherit;
-  outline:none; transition:border-color .2s;
-  background:var(--surface);
+  width:100%; padding:10px 14px; border:1.5px solid var(--border); border-radius:var(--radius-sm);
+  font-size:14px; font-family:inherit; outline:none; transition:border-color .2s; background:var(--surface);
 }
 .member-input:focus{ border-color:var(--blue); }
 .member-input::placeholder{ color:var(--text-3); }
-
 /* — SUGGEST DROPDOWN — */
 .suggest-dropdown{
-  position:absolute; top:100%; left:0; right:0;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--radius-sm);
-  box-shadow:var(--shadow-lg);
-  max-height:240px; overflow-y:auto;
-  z-index:200;
-  display:none;
-  margin-top:4px;
+  position:absolute; top:100%; left:0; right:0; background:var(--surface);
+  border:1px solid var(--border); border-radius:var(--radius-sm); box-shadow:var(--shadow-lg);
+  max-height:240px; overflow-y:auto; z-index:200; display:none; margin-top:4px;
 }
 .suggest-dropdown.open{ display:block; }
-.suggest-item{
-  display:flex; align-items:center; gap:12px;
-  padding:10px 14px;
-  cursor:pointer;
-  transition:background .15s;
-}
-.suggest-item:hover, .suggest-item.active{
-  background:var(--surface-2);
-}
+.suggest-item{ display:flex; align-items:center; gap:12px; padding:10px 14px; cursor:pointer; transition:background .15s; }
+.suggest-item:hover, .suggest-item.active{ background:var(--surface-2); }
 .suggest-avatar{
-  width:36px; height:36px; border-radius:50%;
-  background:var(--blue-light); color:var(--blue);
-  display:flex; align-items:center; justify-content:center;
-  font-size:14px; font-weight:600; flex-shrink:0;
+  width:36px; height:36px; border-radius:50%; background:var(--blue-light); color:var(--blue);
+  display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; flex-shrink:0;
 }
 .suggest-info{ flex:1; min-width:0; }
-.suggest-name{
-  font-size:14px; font-weight:500; color:var(--text);
-  white-space:nowrap; overflow:visible; text-overflow:ellipsis;
-}
-.suggest-email{
-  font-size:12px; color:var(--text-3);
-  white-space:nowrap; overflow:visible; text-overflow:ellipsis;
-}
-
+.suggest-name{ font-size:14px; font-weight:500; color:var(--text); white-space:nowrap; overflow:visible; text-overflow:ellipsis; }
+.suggest-email{ font-size:12px; color:var(--text-3); white-space:nowrap; overflow:visible; text-overflow:ellipsis; }
 /* — SELECTED MEMBERS (CHIPS) — */
-.member-chips{
-  display:flex; flex-wrap:wrap; gap:6px;
-}
+.member-chips{ display:flex; flex-wrap:wrap; gap:6px; }
 .member-chip{
-  display:inline-flex; align-items:center; gap:6px;
-  background:var(--blue-light); color:var(--blue);
-  padding:4px 10px 4px 6px;
-  border-radius:20px; font-size:13px; font-weight:500;
+  display:inline-flex; align-items:center; gap:6px; background:var(--blue-light);
+  color:var(--blue); padding:4px 10px 4px 6px; border-radius:20px; font-size:13px; font-weight:500;
 }
 .member-chip .chip-avatar{
-  width:22px; height:22px; border-radius:50%;
-  background:var(--blue); color:#fff;
-  display:flex; align-items:center; justify-content:center;
-  font-size:10px; font-weight:600;
+  width:22px; height:22px; border-radius:50%; background:var(--blue); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:600;
 }
-.member-chip .chip-remove{
-  cursor:pointer; opacity:.6;
-  font-size:16px; line-height:1;
-  transition:opacity .15s;
-}
+.member-chip .chip-remove{ cursor:pointer; opacity:.6; font-size:16px; line-height:1; transition:opacity .15s; }
 .member-chip .chip-remove:hover{ opacity:1; }
-
 /* — SEARCH CONTROLS — */
 .search-controls{ display:flex; flex-direction:column; gap:12px; }
-.control-row{
-  display:flex; gap:10px; align-items:center;
-}
-.control-row label{
-  font-size:13px; color:var(--text-2); white-space:nowrap; min-width:60px;
-}
+.control-row{ display:flex; gap:10px; align-items:center; }
+.control-row label{ font-size:13px; color:var(--text-2); white-space:nowrap; min-width:60px; }
 .control-row select, .control-row input[type="number"]{
-  flex:1; padding:8px 12px;
-  border:1.5px solid var(--border);
-  border-radius:var(--radius-sm);
-  font-size:14px; font-family:inherit;
-  background:var(--surface);
-  outline:none;
+  flex:1; padding:8px 12px; border:1.5px solid var(--border); border-radius:var(--radius-sm);
+  font-size:14px; font-family:inherit; background:var(--surface); outline:none;
 }
-.control-row select:focus, .control-row input:focus{
-  border-color:var(--blue);
-}
+.control-row select:focus, .control-row input:focus{ border-color:var(--blue); }
 .search-btn{
-  width:100%; padding:12px;
-  background:var(--blue); color:#fff;
-  border:none; border-radius:var(--radius-sm);
-  font-size:14px; font-weight:600; font-family:inherit;
+  width:100%; padding:12px; background:var(--blue); color:#fff; border:none;
+  border-radius:var(--radius-sm); font-size:14px; font-weight:600; font-family:inherit;
   cursor:pointer; transition:background .2s;
 }
 .search-btn:hover{ background:#1557b0; }
-.search-btn:disabled{
-  background:var(--text-3); cursor:not-allowed;
-}
-
+.search-btn:disabled{ background:var(--text-3); cursor:not-allowed; }
 /* — RESULTS — */
 .result-list{ display:flex; flex-direction:column; gap:8px; }
 .slot-card{
-  background:var(--surface-2);
-  border:1px solid var(--border);
-  border-radius:var(--radius-sm);
-  padding:14px 16px;
-  display:flex; align-items:center; justify-content:space-between;
-  cursor:pointer; transition:all .2s;
+  background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-sm);
+  padding:14px 16px; display:flex; align-items:center; justify-content:space-between;
+  transition:all .2s;
 }
-.slot-card:hover{
-  border-color:var(--blue); background:var(--blue-light);
-}
+.slot-card:hover{ border-color:var(--blue); background:var(--blue-light); }
 .slot-date{ font-size:14px; font-weight:500; }
 .slot-time{ font-size:13px; color:var(--text-2); }
-.slot-score{
-  font-size:12px; font-weight:600;
-  background:var(--green-light); color:var(--green);
-  padding:2px 8px; border-radius:10px;
+.slot-actions{ display:flex; gap:6px; align-items:center; }
+.btn-copy{
+  padding:5px 10px; border:1px solid var(--border); border-radius:6px;
+  background:var(--surface); cursor:pointer; font-size:12px; color:var(--text-2); transition:background .15s;
 }
+.btn-copy:hover{ background:var(--surface-3); }
+.btn-meet{
+  padding:5px 12px; border:none; border-radius:6px; background:var(--blue); color:#fff;
+  cursor:pointer; font-size:12px; font-weight:500; transition:opacity .15s;
+}
+.btn-meet:hover{ opacity:.9; }
+.btn-meet:disabled{ background:var(--text-3); cursor:not-allowed; }
+/* — TOAST — */
 .copy-toast{
   position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
-  background:var(--text); color:#fff; padding:10px 20px;
-  border-radius:8px; font-size:13px; font-weight:500;
-  opacity:0; transition:opacity .3s; pointer-events:none; z-index:999;
+  background:var(--text); color:#fff; padding:10px 20px; border-radius:8px;
+  font-size:13px; font-weight:500; opacity:0; transition:opacity .3s; pointer-events:none; z-index:999;
 }
 .copy-toast.show{ opacity:1; }
-
 /* — EMPTY STATE — */
-.empty-state{
-  text-align:center; padding:32px 16px; color:var(--text-3);
-}
+.empty-state{ text-align:center; padding:32px 16px; color:var(--text-3); }
 .empty-state-icon{ font-size:32px; margin-bottom:8px; }
 .empty-state-text{ font-size:13px; }
-
 /* — LOADING — */
 .loading{ text-align:center; padding:24px; color:var(--text-3); font-size:13px; }
 .loading::before{
   content:''; display:block; width:24px; height:24px; margin:0 auto 8px;
-  border:2px solid var(--border); border-top-color:var(--blue);
-  border-radius:50%; animation:spin .6s linear infinite;
+  border:2px solid var(--border); border-top-color:var(--blue); border-radius:50%;
+  animation:spin .6s linear infinite;
 }
 @keyframes spin{ to{transform:rotate(360deg)} }
-  </style>
+/* — SUCCESS CARD — */
+.success-card{
+  background:linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  border:1px solid #a5d6a7; border-radius:var(--radius); padding:24px; text-align:center;
+}
+.success-card h3{ font-size:18px; font-weight:600; color:#2e7d32; margin-bottom:4px; }
+.success-card .detail-box{
+  background:var(--surface); border-radius:var(--radius-sm); padding:16px; text-align:left; margin-top:16px;
+}
+.btn-meet-link{
+  display:inline-flex; align-items:center; gap:6px; padding:8px 16px;
+  background:#1a73e8; color:#fff; border-radius:6px; text-decoration:none;
+  font-size:13px; font-weight:500; margin-top:12px;
+}
+.btn-meet-link:hover{ opacity:.9; }
+.btn-cal-link{ color:var(--blue); font-size:13px; text-decoration:none; margin-top:8px; display:inline-block; }
+</style>
 </head>
 <body>
 
@@ -523,7 +164,6 @@ body{
 </header>
 
 <div class="container">
-
   <!-- MEMBER CARD -->
   <div class="card">
     <div class="card-header">
@@ -534,7 +174,7 @@ body{
       <div id="memberChips" class="member-chips"></div>
       <div class="member-input-wrap">
         <input type="text" class="member-input" id="memberInput"
-               placeholder="名前またはメールで検索..." autocomplete="off">
+          placeholder="名前またはメールで検索..." autocomplete="off">
         <div class="suggest-dropdown" id="suggestDropdown"></div>
       </div>
     </div>
@@ -574,7 +214,6 @@ body{
       </div>
     </div>
   </div>
-
 </div>
 
 <!-- TOAST -->
@@ -589,9 +228,10 @@ const GAS_URL = 'https://script.google.com/macros/s/AKfycbzYAXR5n8_H_96v2Sv6YppU
 // ─────────────────────────────────────────────
 // STATE
 // ─────────────────────────────────────────────
-let allMembers = [];        // {email, name} from GAS
-let selectedMembers = [];   // emails
+let allMembers = [];
+let selectedMembers = [];
 let suggestIndex = -1;
+let currentSlots = [];  // v4: スロットデータ保持
 
 // ─────────────────────────────────────────────
 // INIT
@@ -610,21 +250,16 @@ async function fetchMembers() {
     const res = await fetch(GAS_URL + '?' + params.toString());
     const data = await res.json();
     if (data.status === 'success' && data.members) {
-      // members can be array of strings (emails) or objects
       allMembers = data.members.map(m => {
-        if (typeof m === 'string') {
-          return { email: m, name: m.split('@')[0] };
-        }
+        if (typeof m === 'string') return { email: m, name: m.split('@')[0] };
         return { email: m.email || m, name: m.name || m.email?.split('@')[0] || '' };
       });
       updateConnectionBadge(true);
-      showToast(`✅ ${allMembers.length}名のメンバーを取得しました`, 'success');
-    } else {
-      throw new Error(data.message || 'メンバー取得失敗');
-    }
+      showToast('\u2705 ' + allMembers.length + '名のメンバーを取得しました', 'success');
+    } else { throw new Error(data.message || 'メンバー取得失敗'); }
   } catch (e) {
     updateConnectionBadge(false);
-    showToast('⚠️ GAS接続エラー: ' + e.message, 'error');
+    showToast('\u26a0\ufe0f GAS接続エラー: ' + e.message, 'error');
   }
 }
 
@@ -639,17 +274,11 @@ function setupMemberInput() {
     const q = input.value.trim().toLowerCase();
     suggestIndex = -1;
     if (!q) { dropdown.classList.remove('open'); return; }
-
     const filtered = allMembers.filter(m =>
       !selectedMembers.includes(m.email) &&
       (m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q))
     );
-
-    if (filtered.length === 0) {
-      dropdown.classList.remove('open');
-      return;
-    }
-
+    if (filtered.length === 0) { dropdown.classList.remove('open'); return; }
     dropdown.innerHTML = filtered.slice(0, 8).map((m, i) => `
       <div class="suggest-item" data-email="${m.email}" data-index="${i}">
         <div class="suggest-avatar">${getInitials(m.name)}</div>
@@ -659,39 +288,23 @@ function setupMemberInput() {
         </div>
       </div>
     `).join('');
-
     dropdown.querySelectorAll('.suggest-item').forEach(el => {
       el.addEventListener('click', () => selectMember(el.dataset.email));
     });
     dropdown.classList.add('open');
   });
 
-  // Keyboard navigation
   input.addEventListener('keydown', (e) => {
     const items = dropdown.querySelectorAll('.suggest-item');
     if (!dropdown.classList.contains('open') || items.length === 0) return;
-
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      suggestIndex = Math.min(suggestIndex + 1, items.length - 1);
-      updateSuggestHighlight(items);
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      suggestIndex = Math.max(suggestIndex - 1, 0);
-      updateSuggestHighlight(items);
-    } else if (e.key === 'Enter' && suggestIndex >= 0) {
-      e.preventDefault();
-      items[suggestIndex]?.click();
-    } else if (e.key === 'Escape') {
-      dropdown.classList.remove('open');
-    }
+    if (e.key === 'ArrowDown') { e.preventDefault(); suggestIndex = Math.min(suggestIndex + 1, items.length - 1); updateSuggestHighlight(items); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); suggestIndex = Math.max(suggestIndex - 1, 0); updateSuggestHighlight(items); }
+    else if (e.key === 'Enter' && suggestIndex >= 0) { e.preventDefault(); items[suggestIndex]?.click(); }
+    else if (e.key === 'Escape') { dropdown.classList.remove('open'); }
   });
 
-  // Close dropdown on outside click
   document.addEventListener('click', (e) => {
-    if (!e.target.closest('.member-input-wrap')) {
-      dropdown.classList.remove('open');
-    }
+    if (!e.target.closest('.member-input-wrap')) dropdown.classList.remove('open');
   });
 }
 
@@ -720,7 +333,7 @@ function renderChips() {
       <div class="member-chip">
         <div class="chip-avatar">${getInitials(m.name)}</div>
         <span>${m.name}</span>
-        <span class="chip-remove" onclick="removeMember('${email}')">✕</span>
+        <span class="chip-remove" onclick="removeMember('${email}')">\u2715</span>
       </div>
     `;
   }).join('');
@@ -731,11 +344,7 @@ function renderChips() {
 // SEARCH SLOTS
 // ─────────────────────────────────────────────
 async function searchSlots() {
-  if (selectedMembers.length === 0) {
-    showToast('⚠️ 参加者を選択してください', 'error');
-    return;
-  }
-
+  if (selectedMembers.length === 0) { showToast('\u26a0\ufe0f 参加者を選択してください', 'error'); return; }
   const btn = document.getElementById('searchBtn');
   const slotList = document.getElementById('slotList');
   btn.disabled = true;
@@ -744,37 +353,21 @@ async function searchSlots() {
 
   try {
     const duration = document.getElementById('durationSelect').value;
-    const params = new URLSearchParams({
-      action: 'slots',
-      duration: duration,
-      emails: selectedMembers.join(',')
-    });
+    const params = new URLSearchParams({ action: 'slots', duration, emails: selectedMembers.join(',') });
     const res = await fetch(GAS_URL + '?' + params.toString());
     const data = await res.json();
-
     if (data.status === 'success') {
-      const slots = (data.slots || []).slice(0, 5);
-      document.getElementById('slotCount').textContent = slots.length + '件';
-
-      if (slots.length === 0) {
-        slotList.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">😔</div>
-            <div class="empty-state-text">空き枠が見つかりませんでした</div>
-          </div>`;
+      currentSlots = (data.slots || []).slice(0, 5);
+      document.getElementById('slotCount').textContent = currentSlots.length + '件';
+      if (currentSlots.length === 0) {
+        slotList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">😔</div><div class="empty-state-text">空き枠が見つかりませんでした</div></div>';
       } else {
-        renderSlots(slots);
+        renderSlots(currentSlots);
       }
       updateConnectionBadge(true);
-    } else {
-      throw new Error(data.message || '検索エラー');
-    }
+    } else { throw new Error(data.message || '検索エラー'); }
   } catch (e) {
-    slotList.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-state-icon">⚠️</div>
-        <div class="empty-state-text">エラー: ${e.message}</div>
-      </div>`;
+    slotList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">\u26a0\ufe0f</div><div class="empty-state-text">エラー: ' + e.message + '</div></div>';
     updateConnectionBadge(false);
   } finally {
     btn.disabled = false;
@@ -783,32 +376,111 @@ async function searchSlots() {
 }
 
 // ─────────────────────────────────────────────
-// RENDER SLOTS
+// RENDER SLOTS (v4: ミーティング作成ボタン付き)
 // ─────────────────────────────────────────────
 function renderSlots(slots) {
   const el = document.getElementById('slotList');
-  el.innerHTML = '<div class="result-list">' + slots.map(slot => {
+  el.innerHTML = '<div class="result-list">' + slots.map((slot, idx) => {
     const start = new Date(slot.start);
     const end = new Date(slot.end);
-    const dateStr = `${start.getMonth()+1}/${start.getDate()}(${['日','月','火','水','木','金','土'][start.getDay()]})`;
-    const timeStr = `${fmt(start)} 〜 ${fmt(end)}`;
+    const dateStr = (start.getMonth()+1) + '/' + start.getDate() + '(' + ['日','月','火','水','木','金','土'][start.getDay()] + ')';
+    const timeStr = fmt(start) + ' 〜 ' + fmt(end);
     const score = slot.score != null ? slot.score : '';
     return `
-      <div class="slot-card" onclick="copySlot(this, '${slot.start}')">
+      <div class="slot-card">
         <div>
           <div class="slot-date">${dateStr}</div>
           <div class="slot-time">${timeStr}</div>
         </div>
-        ${score ? `<div class="slot-score">${score}点</div>` : ''}
+        <div class="slot-actions">
+          ${score ? '<span style="font-size:12px;font-weight:600;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:10px;">' + score + '点</span>' : ''}
+          <button class="btn-copy" onclick="copySlot(${idx})">📋 コピー</button>
+          <button class="btn-meet" id="meetBtn${idx}" onclick="createMeeting(${idx})">📹 ミーティング作成</button>
+        </div>
       </div>`;
   }).join('') + '</div>';
 }
 
-function copySlot(el, iso) {
-  const d = new Date(iso);
-  const text = `${d.getMonth()+1}/${d.getDate()} ${fmt(d)}〜`;
+// ─────────────────────────────────────────────
+// v4: CREATE MEETING (Google Meet + Calendar)
+// ─────────────────────────────────────────────
+async function createMeeting(index) {
+  const slot = currentSlots[index];
+  if (!slot) { showToast('スロットデータがありません', 'error'); return; }
+
+  const title = prompt('ミーティングの件名を入力してください:', 'ミーティング');
+  if (!title) return;
+
+  const btn = document.getElementById('meetBtn' + index);
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ 作成中…'; }
+
+  try {
+    const res = await fetch(GAS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: 'create',
+        title: title,
+        start: slot.start,
+        end: slot.end,
+        attendees: selectedMembers,
+        note: ''
+      })
+    });
+    const data = await res.json();
+
+    if (data.status === 'success') {
+      showMeetingSuccess(data, slot);
+      showToast('🎉 ミーティングを作成しました！', 'success');
+    } else {
+      showToast('作成エラー: ' + (data.message || '不明なエラー'), 'error');
+    }
+  } catch (e) {
+    showToast('通信エラー: ' + e.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '📹 ミーティング作成'; }
+  }
+}
+
+// ─────────────────────────────────────────────
+// v4: MEETING SUCCESS DISPLAY
+// ─────────────────────────────────────────────
+function showMeetingSuccess(data, slot) {
+  const start = new Date(slot.start);
+  const end = new Date(slot.end);
+  const dateStr = (start.getMonth()+1) + '/' + start.getDate() + '(' + ['日','月','火','水','木','金','土'][start.getDay()] + ')';
+  const timeStr = fmt(start) + ' 〜 ' + fmt(end);
+
+  const el = document.getElementById('slotList');
+  el.innerHTML = `
+    <div class="success-card">
+      <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+      <h3>ミーティングを作成しました！</h3>
+      <div style="font-size:14px;color:var(--text-2);margin-bottom:4px;">参加者全員に招待メールが送信されました</div>
+      <div class="detail-box">
+        <div style="font-weight:600;font-size:16px;margin-bottom:8px;">📌 ${data.summary || ''}</div>
+        <div style="color:var(--text-2);font-size:13px;">📅 ${dateStr} ${timeStr}</div>
+        ${data.meetLink ? `<div><a href="${data.meetLink}" target="_blank" class="btn-meet-link">📹 Google Meet に参加</a></div>` : ''}
+        ${data.htmlLink ? `<div><a href="${data.htmlLink}" target="_blank" class="btn-cal-link">📎 Googleカレンダーで開く →</a></div>` : ''}
+      </div>
+      <div style="font-size:12px;color:var(--text-3);margin-top:12px;">
+        ${(data.attendees || []).map(a => a.email).join(', ')}
+      </div>
+      <button onclick="searchSlots()" style="margin-top:16px;padding:8px 20px;background:var(--blue);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;">🔍 もう一度検索</button>
+    </div>
+  `;
+}
+
+// ─────────────────────────────────────────────
+// COPY SLOT
+// ─────────────────────────────────────────────
+function copySlot(index) {
+  const slot = currentSlots[index];
+  if (!slot) return;
+  const d = new Date(slot.start);
+  const text = (d.getMonth()+1) + '/' + d.getDate() + ' ' + fmt(d) + '〜';
   navigator.clipboard.writeText(text).then(() => {
-    showToast(`📋 コピーしました: ${text}`, 'success');
+    showToast('📋 コピーしました: ' + text, 'success');
   }).catch(() => {});
 }
 
@@ -821,7 +493,7 @@ function fmt(d) {
 
 function getInitials(name) {
   if (!name) return '?';
-  const parts = name.replace(/[^\w\s　-鿿]/g, '').trim().split(/[\s　]+/);
+  const parts = name.replace(/[^\w\s\u3000-\u9FFF]/g, '').trim().split(/[\s\u3000]+/);
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
   return name.substring(0, 2).toUpperCase();
 }
@@ -835,13 +507,8 @@ function highlightMatch(text, query) {
 
 function updateConnectionBadge(connected) {
   const badge = document.getElementById('connBadge');
-  if (connected) {
-    badge.className = 'conn-badge ok';
-    badge.textContent = '接続中';
-  } else {
-    badge.className = 'conn-badge err';
-    badge.textContent = '未接続';
-  }
+  if (connected) { badge.className = 'conn-badge ok'; badge.textContent = '接続中'; }
+  else { badge.className = 'conn-badge err'; badge.textContent = '未接続'; }
 }
 
 function showToast(msg, type) {
