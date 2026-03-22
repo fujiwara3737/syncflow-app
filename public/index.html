@@ -1,6 +1,295 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SyncFlow v3 for Google</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f9fb;--surface:#fff;--surface-2:#f1f3f5;--surface-3:#e9ecef;
+  --text:#1a1d23;--text-2:#4a5060;--text-3:#8890a0;
+  --blue:#1a73e8;--blue-light:#e8f0fe;
+  --green:#0f9d58;--green-light:#e6f4ea;
+  --red:#d93025;--red-light:#fce8e6;
+  --yellow:#f9ab00;--yellow-light:#fef7e0;
+  --purple:#7c3aed;--purple-light:#ede9fe;
+  --border:#dee2e8;--radius:12px;--radius-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.1),0 4px 10px rgba(0,0,0,.06);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;}
+.app-header{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.app-header h1{font-size:18px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:8px;}
+.app-header h1 span{color:var(--blue);}
+.conn-badge{font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500;display:flex;align-items:center;gap:4px;}
+.conn-badge.ok{background:var(--green-light);color:var(--green);}
+.conn-badge.err{background:var(--red-light);color:var(--red);}
+.conn-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;}
+.container{max-width:640px;margin:0 auto;padding:20px 16px 80px;display:flex;flex-direction:column;gap:16px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:visible;}
+.card-header{padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-size:14px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px;}
+.card-body{padding:0 20px 20px;}
+.member-section{display:flex;flex-direction:column;gap:12px;}
+.member-input-wrap{position:relative;}
+.member-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;outline:none;transition:border-color .2s;background:var(--surface);}
+.member-input:focus{border-color:var(--blue);}
+.member-input::placeholder{color:var(--text-3);}
+.suggest-dropdown{position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);max-height:240px;overflow-y:auto;z-index:200;display:none;margin-top:4px;}
+.suggest-dropdown.open{display:block;}
+.suggest-item{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer;transition:background .15s;}
+.suggest-item:hover,.suggest-item.active{background:var(--surface-2);}
+.suggest-avatar{width:36px;height:36px;border-radius:50%;background:var(--blue-light);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;flex-shrink:0;}
+.suggest-info{flex:1;min-width:0;}
+.suggest-name{font-size:14px;font-weight:500;color:var(--text);white-space:nowrap;overflow:visible;text-overflow:ellipsis;}
+.suggest-email{font-size:12px;color:var(--text-3);white-space:nowrap;overflow:visible;text-overflow:ellipsis;}
+.member-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.member-chip{display:inline-flex;align-items:center;gap:6px;background:var(--blue-light);color:var(--blue);padding:4px 10px 4px 6px;border-radius:20px;font-size:13px;font-weight:500;}
+.member-chip .chip-avatar{width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;}
+.member-chip .chip-remove{cursor:pointer;opacity:.6;font-size:16px;line-height:1;transition:opacity .15s;}
+.member-chip .chip-remove:hover{opacity:1;}
+.search-controls{display:flex;flex-direction:column;gap:12px;}
+.control-row{display:flex;gap:10px;align-items:center;}
+.control-row label{font-size:13px;color:var(--text-2);white-space:nowrap;min-width:60px;}
+.control-row select,.control-row input[type="number"]{flex:1;padding:8px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:inherit;background:var(--surface);outline:none;}
+.control-row select:focus,.control-row input:focus{border-color:var(--blue);}
+.search-btn{width:100%;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .2s;}
+.search-btn:hover{background:#1557b0;}
+.search-btn:disabled{background:var(--text-3);cursor:not-allowed;}
+.result-list{display:flex;flex-direction:column;gap:8px;}
+.slot-card{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;transition:all .2s;}
+.slot-card:hover{border-color:var(--blue);background:var(--blue-light);}
+.slot-date{font-size:14px;font-weight:500;}
+.slot-time{font-size:13px;color:var(--text-2);}
+.slot-actions{display:flex;gap:6px;align-items:center;}
+.btn-copy{padding:5px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;font-size:12px;color:var(--text-2);transition:background .15s;}
+.btn-copy:hover{background:var(--surface-3);}
+.btn-meet{padding:5px 12px;border:none;border-radius:6px;background:var(--blue);color:#fff;cursor:pointer;font-size:12px;font-weight:500;transition:opacity .15s;}
+.btn-meet:hover{opacity:.9;}
+.btn-meet:disabled{background:var(--text-3);cursor:not-allowed;}
+.copy-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;}
+.copy-toast.show{opacity:1;}
+.empty-state{text-align:center;padding:32px 16px;color:var(--text-3);}
+.empty-state-icon{font-size:32px;margin-bottom:8px;}
+.empty-state-text{font-size:13px;}
+.loading{text-align:center;padding:24px;color:var(--text-3);font-size:13px;}
+.loading::before{content:'';display:block;width:24px;height:24px;margin:0 auto 8px;border:2px solid var(--border);border-top-color:var(--blue);border-radius:50%;animation:spin .6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.success-card{background:linear-gradient(135deg,#e8f5e9 0%,#f1f8e9 100%);border:1px solid #a5d6a7;border-radius:var(--radius);padding:24px;text-align:center;}
+.success-card h3{font-size:18px;font-weight:600;color:#2e7d32;margin-bottom:4px;}
+.success-card .detail-box{background:var(--surface);border-radius:var(--radius-sm);padding:16px;text-align:left;margin-top:16px;}
+.btn-meet-link{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:#1a73e8;color:#fff;border-radius:6px;text-decoration:none;font-size:13px;font-weight:500;margin-top:12px;}
+.btn-meet-link:hover{opacity:.9;}
+.btn-cal-link{color:var(--blue);font-size:13px;text-decoration:none;margin-top:8px;display:inline-block;}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <h1>\u{1F4C5} <span>SyncFlow</span> v3</h1>
+  <div class="conn-badge err" id="connBadge">\u672A\u63A5\u7D9A</div>
+</header>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">\u{1F465} \u53C2\u52A0\u8005</span>
+      <span id="memberCount" style="font-size:12px;color:var(--text-3)">0\u540D</span>
+    </div>
+    <div class="card-body member-section">
+      <div id="memberChips" class="member-chips"></div>
+      <div class="member-input-wrap">
+        <input type="text" class="member-input" id="memberInput" placeholder="\u540D\u524D\u307E\u305F\u306F\u30E1\u30FC\u30EB\u3067\u691C\u7D22..." autocomplete="off">
+        <div class="suggest-dropdown" id="suggestDropdown"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><span class="card-title">\u{1F50D} \u7A7A\u304D\u67A0\u3092\u63A2\u3059</span></div>
+    <div class="card-body search-controls">
+      <div class="control-row">
+        <label>\u6240\u8981\u6642\u9593</label>
+        <select id="durationSelect">
+          <option value="30">30\u5206</option>
+          <option value="60" selected>60\u5206</option>
+          <option value="90">90\u5206</option>
+          <option value="120">120\u5206</option>
+        </select>
+      </div>
+      <button class="search-btn" id="searchBtn" onclick="searchSlots()">\u{1F50D} \u7A7A\u304D\u67A0\u3092\u691C\u7D22</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">\u{1F4CB} \u691C\u7D22\u7D50\u679C</span>
+      <span id="slotCount" style="font-size:12px;color:var(--text-3)"></span>
+    </div>
+    <div class="card-body">
+      <div id="slotList">
+        <div class="empty-state">
+          <div class="empty-state-icon">\u{1F4ED}</div>
+          <div class="empty-state-text">\u53C2\u52A0\u8005\u3092\u9078\u3093\u3067\u691C\u7D22\u30DC\u30BF\u30F3\u3092\u62BC\u3057\u3066\u304F\u3060\u3055\u3044</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="copy-toast" id="toastContainer"></div>
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzYAXR5n8_H_96v2Sv6YppUdSEB0-hBFx6K0KZozrAgWMdmYu7a66dWXmPrCtyO2w0b7g/exec';
+let allMembers = [];
+let selectedMembers = [];
+let suggestIndex = -1;
+let currentSlots = [];
+
+document.addEventListener('DOMContentLoaded', () => {
+  fetchMembers();
+  setupMemberInput();
+});
+
+async function fetchMembers() {
+  try {
+    const params = new URLSearchParams({ action: 'members' });
+    const res = await fetch(GAS_URL + '?' + params.toString());
+    const data = await res.json();
+    if (data.status === 'success' && data.members) {
+      allMembers = data.members.map(m => {
+        if (typeof m === 'string') return { email: m, name: m.split('@')[0] };
+        return { email: m.email || m, name: m.name || m.email?.split('@')[0] || '' };
+      });
+      updateConnectionBadge(true);
+      showToast('\u2705 ' + allMembers.length + '\u540D\u306E\u30E1\u30F3\u30D0\u30FC\u3092\u53D6\u5F97\u3057\u307E\u3057\u305F', 'success');
+    } else { throw new Error(data.message || 'failed'); }
+  } catch (e) {
+    updateConnectionBadge(false);
+    showToast('\u26A0\uFE0F GAS error: ' + e.message, 'error');
+  }
+}
+
+function setupMemberInput() {
+  const input = document.getElementById('memberInput');
+  const dropdown = document.getElementById('suggestDropdown');
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    suggestIndex = -1;
+    if (!q) { dropdown.classList.remove('open'); return; }
+    const filtered = allMembers.filter(m => !selectedMembers.includes(m.email) && (m.name.toLowerCase().includes(q) || m.email.toLowerCase().includes(q)));
+    if (filtered.length === 0) { dropdown.classList.remove('open'); return; }
+    dropdown.innerHTML = filtered.slice(0, 8).map((m, i) => `
+      <div class="suggest-item" data-email="${m.email}" data-index="${i}">
+        <div class="suggest-avatar">${getInitials(m.name)}</div>
+        <div class="suggest-info">
+          <div class="suggest-name">${highlightMatch(m.name, q)}</div>
+          <div class="suggest-email">${highlightMatch(m.email, q)}</div>
+        </div>
+      </div>`).join('');
+    dropdown.querySelectorAll('.suggest-item').forEach(el => {
+      el.addEventListener('click', () => selectMember(el.dataset.email));
+    });
+    dropdown.classList.add('open');
+  });
+  input.addEventListener('keydown', (e) => {
+    const items = dropdown.querySelectorAll('.suggest-item');
+    if (!dropdown.classList.contains('open') || items.length === 0) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); suggestIndex = Math.min(suggestIndex + 1, items.length - 1); updateSuggestHighlight(items); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); suggestIndex = Math.max(suggestIndex - 1, 0); updateSuggestHighlight(items); }
+    else if (e.key === 'Enter' && suggestIndex >= 0) { e.preventDefault(); items[suggestIndex]?.click(); }
+    else if (e.key === 'Escape') { dropdown.classList.remove('open'); }
+  });
+  document.addEventListener('click', (e) => { if (!e.target.closest('.member-input-wrap')) dropdown.classList.remove('open'); });
+}
+function updateSuggestHighlight(items) { items.forEach((el, i) => el.classList.toggle('active', i === suggestIndex)); }
+function selectMember(email) {
+  if (selectedMembers.includes(email)) return;
+  selectedMembers.push(email);
+  document.getElementById('memberInput').value = '';
+  document.getElementById('suggestDropdown').classList.remove('open');
+  renderChips();
+}
+function removeMember(email) { selectedMembers = selectedMembers.filter(e => e !== email); renderChips(); }
+function renderChips() {
+  const container = document.getElementById('memberChips');
+  container.innerHTML = selectedMembers.map(email => {
+    const m = allMembers.find(x => x.email === email) || { name: email.split('@')[0], email };
+    return `<div class="member-chip"><div class="chip-avatar">${getInitials(m.name)}</div><span>${m.name}</span><span class="chip-remove" onclick="removeMember('${email}')">\u2715</span></div>`;
+  }).join('');
+  document.getElementById('memberCount').textContent = selectedMembers.length + '\u540D';
+}
+async function searchSlots() {
+  if (selectedMembers.length === 0) { showToast('\u26A0\uFE0F \u53C2\u52A0\u8005\u3092\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044', 'error'); return; }
+  const btn = document.getElementById('searchBtn');
+  const slotList = document.getElementById('slotList');
+  btn.disabled = true; btn.innerHTML = '\u{1F504} \u691C\u7D22\u4E2D...';
+  slotList.innerHTML = '<div class="loading">\u7A7A\u304D\u67A0\u3092\u691C\u7D22\u3057\u3066\u3044\u307E\u3059...</div>';
+  try {
+    const duration = document.getElementById('durationSelect').value;
+    const params = new URLSearchParams({ action: 'slots', duration, emails: selectedMembers.join(',') });
+    const res = await fetch(GAS_URL + '?' + params.toString());
+    const data = await res.json();
+    if (data.status === 'success') {
+      currentSlots = (data.slots || []).slice(0, 5);
+      document.getElementById('slotCount').textContent = currentSlots.length + '\u4EF6';
+      if (currentSlots.length === 0) {
+        slotList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">\u{1F614}</div><div class="empty-state-text">\u7A7A\u304D\u67A0\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093\u3067\u3057\u305F</div></div>';
+      } else { renderSlots(currentSlots); }
+      updateConnectionBadge(true);
+    } else { throw new Error(data.message || 'error'); }
+  } catch (e) {
+    slotList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">\u26A0\uFE0F</div><div class="empty-state-text">\u30A8\u30E9\u30FC: ' + e.message + '</div></div>';
+    updateConnectionBadge(false);
+  } finally { btn.disabled = false; btn.innerHTML = '\u{1F50D} \u7A7A\u304D\u67A0\u3092\u691C\u7D22'; }
+}
+function renderSlots(slots) {
+  const el = document.getElementById('slotList');
+  el.innerHTML = '<div class="result-list">' + slots.map((slot, idx) => {
+    const s = new Date(slot.start), e = new Date(slot.end);
+    const ds = (s.getMonth()+1)+'/'+s.getDate()+'('+['\u65E5','\u6708','\u706B','\u6C34','\u6728','\u91D1','\u571F'][s.getDay()]+')';
+    const ts = fmt(s)+' \u301C '+fmt(e);
+    const sc = slot.score!=null?slot.score:'';
+    return `<div class="slot-card"><div><div class="slot-date">${ds}</div><div class="slot-time">${ts}</div></div><div class="slot-actions">${sc?'<span style="font-size:12px;font-weight:600;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:10px;">'+sc+'\u70B9</span>':''}<button class="btn-copy" onclick="copySlot(${idx})">\u{1F4CB} \u30B3\u30D4\u30FC</button><button class="btn-meet" id="meetBtn${idx}" onclick="createMeeting(${idx})">\u{1F4F9} \u30DF\u30FC\u30C6\u30A3\u30F3\u30B0\u4F5C\u6210</button></div></div>`;
+  }).join('')+'</div>';
+                }
+async function createMeeting(index) {
+  const slot = currentSlots[index];
+  if (!slot) { showToast('No slot data', 'error'); return; }
+  const title = prompt('\u30DF\u30FC\u30C6\u30A3\u30F3\u30B0\u306E\u4EF6\u540D\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044:', '\u30DF\u30FC\u30C6\u30A3\u30F3\u30B0');
+  if (!title) return;
+  const btn = document.getElementById('meetBtn' + index);
+  if (btn) { btn.disabled = true; btn.innerHTML = '\u23F3 \u4F5C\u6210\u4E2D\u2026'; }
+  try {
+    const res = await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'create', title, start: slot.start, end: slot.end, attendees: selectedMembers, note: '' })
+    });
+    const data = await res.json();
+    if (data.status === 'success') { showMeetingSuccess(data, slot); showToast('\u{1F389} \u30DF\u30FC\u30C6\u30A3\u30F3\u30B0\u3092\u4F5C\u6210\u3057\u307E\u3057\u305F\uFF01', 'success'); }
+    else { showToast('\u4F5C\u6210\u30A8\u30E9\u30FC: ' + (data.message || ''), 'error'); }
+  } catch (e) { showToast('\u901A\u4FE1\u30A8\u30E9\u30FC: ' + e.message, 'error'); }
+  finally { if (btn) { btn.disabled = false; btn.innerHTML = '\u{1F4F9} \u30DF\u30FC\u30C6\u30A3\u30F3\u30B0\u4F5C\u6210'; } }
+}
+function showMeetingSuccess(data, slot) {
+  const s = new Date(slot.start), e = new Date(slot.end);
+  const ds = (s.getMonth()+1)+'/'+s.getDate()+'('+['\u65E5','\u6708','\u706B','\u6C34','\u6728','\u91D1','\u571F'][s.getDay()]+')';
+  const ts = fmt(s)+' \u301C '+fmt(e);
+  const el = document.getElementById('slotList');
+  el.innerHTML = `<div class="success-card"><div style="font-size:48px;margin-bottom:12px;">\u{1F389}</div><h3>\u30DF\u30FC\u30C6\u30A3\u30F3\u30B0\u3092\u4F5C\u6210\u3057\u307E\u3057\u305F\uFF01</h3><div style="font-size:14px;color:var(--text-2);margin-bottom:4px;">\u53C2\u52A0\u8005\u5168\u54E1\u306B\u62DB\u5F85\u30E1\u30FC\u30EB\u304C\u9001\u4FE1\u3055\u308C\u307E\u3057\u305F</div><div class="detail-box"><div style="font-weight:600;font-size:16px;margin-bottom:8px;">\u{1F4CC} ${data.summary||''}</div><div style="color:var(--text-2);font-size:13px;">\u{1F4C5} ${ds} ${ts}</div>${data.meetLink?`<div><a href="${data.meetLink}" target="_blank" class="btn-meet-link">\u{1F4F9} Google Meet \u306B\u53C2\u52A0</a></div>`:''}${data.htmlLink?`<div><a href="${data.htmlLink}" target="_blank" class="btn-cal-link">\u{1F4CE} Google\u30AB\u30EC\u30F3\u30C0\u30FC\u3067\u958B\u304F \u2192</a></div>`:''}</div><div style="font-size:12px;color:var(--text-3);margin-top:12px;">${(data.attendees||[]).map(a=>a.email).join(', ')}</div><button onclick="searchSlots()" style="margin-top:16px;padding:8px 20px;background:var(--blue);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;">\u{1F50D} \u3082\u3046\u4E00\u5EA6\u691C\u7D22</button></div>`;
+}
+function copySlot(index) {
+  const slot = currentSlots[index]; if (!slot) return;
+  const d = new Date(slot.start);
+  const text = (d.getMonth()+1)+'/'+d.getDate()+' '+fmt(d)+'\u301C';
+  navigator.clipboard.writeText(text).then(() => showToast('\u{1F4CB} \u30B3\u30D4\u30FC\u3057\u307E\u3057\u305F: '+text, 'success')).catch(()=>{});
+}
+function fmt(d) { return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
+function getInitials(name) { if(!name)return'?';const p=name.replace(/[^\w\s\u3000-\u9FFF]/g,'').trim().split(/[\s\u3000]+/);if(p.length>=2)return(p[0][0]+p[1][0]).toUpperCase();return name.substring(0,2).toUpperCase(); }
+function highlightMatch(text,query) { if(!query)return text;const idx=text.toLowerCase().indexOf(query.toLowerCase());if(idx===-1)return text;return text.substring(0,idx)+'<b style="color:var(--blue)">'+text.substring(idx,idx+query.length)+'</b>'+text.substring(idx+query.length); }
+function updateConnectionBadge(connected) { const b=document.getElementById('connBadge');if(connected){b.className='conn-badge ok';b.textContent='\u63A5\u7D9A\u4E2D';}else{b.className='conn-badge err';b.textContent='\u672A\u63A5\u7D9A';} }
+function showToast(msg,type) { const el=document.getElementById('toastContainer');el.textContent=msg;el.style.background=type==='error'?'var(--red)':type==='success'?'var(--text)':'var(--yellow)';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500); }
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="ja">
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SyncFlow v3 for Google</title>
