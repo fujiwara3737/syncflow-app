@@ -88,48 +88,48 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 <header class="app-header">
-  <h1>\u{1F4C5} <span>SyncFlow</span> v3</h1>
-  <div class="conn-badge err" id="connBadge">\u672A\u63A5\u7D9A</div>
+  <h1>📅 <span>SyncFlow</span> v3</h1>
+  <div class="conn-badge err" id="connBadge">未接続</div>
 </header>
 <div class="container">
   <div class="card">
     <div class="card-header">
-      <span class="card-title">\u{1F465} \u53C2\u52A0\u8005</span>
-      <span id="memberCount" style="font-size:12px;color:var(--text-3)">0\u540D</span>
+      <span class="card-title">👥 参加者</span>
+      <span id="memberCount" style="font-size:12px;color:var(--text-3)">0名</span>
     </div>
     <div class="card-body member-section">
       <div id="memberChips" class="member-chips"></div>
       <div class="member-input-wrap">
-        <input type="text" class="member-input" id="memberInput" placeholder="\u540D\u524D\u307E\u305F\u306F\u30E1\u30FC\u30EB\u3067\u691C\u7D22..." autocomplete="off">
+        <input type="text" class="member-input" id="memberInput" placeholder="名前またはメールで検索..." autocomplete="off">
         <div class="suggest-dropdown" id="suggestDropdown"></div>
       </div>
     </div>
   </div>
   <div class="card">
-    <div class="card-header"><span class="card-title">\u{1F50D} \u7A7A\u304D\u67A0\u3092\u63A2\u3059</span></div>
+    <div class="card-header"><span class="card-title">🔍 空き枠を探す</span></div>
     <div class="card-body search-controls">
       <div class="control-row">
-        <label>\u6240\u8981\u6642\u9593</label>
+        <label>所要時間</label>
         <select id="durationSelect">
-          <option value="30">30\u5206</option>
-          <option value="60" selected>60\u5206</option>
-          <option value="90">90\u5206</option>
-          <option value="120">120\u5206</option>
+          <option value="30">30分</option>
+          <option value="60" selected>60分</option>
+          <option value="90">90分</option>
+          <option value="120">120分</option>
         </select>
       </div>
-      <button class="search-btn" id="searchBtn" onclick="searchSlots()">\u{1F50D} \u7A7A\u304D\u67A0\u3092\u691C\u7D22</button>
+      <button class="search-btn" id="searchBtn" onclick="searchSlots()">🔍 空き枠を検索</button>
     </div>
   </div>
   <div class="card">
     <div class="card-header">
-      <span class="card-title">\u{1F4CB} \u691C\u7D22\u7D50\u679C</span>
+      <span class="card-title">📋 検索結果</span>
       <span id="slotCount" style="font-size:12px;color:var(--text-3)"></span>
     </div>
     <div class="card-body">
       <div id="slotList">
         <div class="empty-state">
-          <div class="empty-state-icon">\u{1F4ED}</div>
-          <div class="empty-state-text">\u53C2\u52A0\u8005\u3092\u9078\u3093\u3067\u691C\u7D22\u30DC\u30BF\u30F3\u3092\u62BC\u3057\u3066\u304F\u3060\u3055\u3044</div>
+          <div class="empty-state-icon">📭</div>
+          <div class="empty-state-text">参加者を選んで検索ボタンを押してください</div>
         </div>
       </div>
     </div>
@@ -159,11 +159,11 @@ async function fetchMembers() {
         return { email: m.email || m, name: m.name || m.email?.split('@')[0] || '' };
       });
       updateConnectionBadge(true);
-      showToast('\u2705 ' + allMembers.length + '\u540D\u306E\u30E1\u30F3\u30D0\u30FC\u3092\u53D6\u5F97\u3057\u307E\u3057\u305F', 'success');
+      showToast('✅ ' + allMembers.length + '名のメンバーを取得しました', 'success');
     } else { throw new Error(data.message || 'failed'); }
   } catch (e) {
     updateConnectionBadge(false);
-    showToast('\u26A0\uFE0F GAS error: ' + e.message, 'error');
+    showToast('⚠️ GAS error: ' + e.message, 'error');
   }
 }
 
@@ -212,16 +212,16 @@ function renderChips() {
   const container = document.getElementById('memberChips');
   container.innerHTML = selectedMembers.map(email => {
     const m = allMembers.find(x => x.email === email) || { name: email.split('@')[0], email };
-    return `<div class="member-chip"><div class="chip-avatar">${getInitials(m.name)}</div><span>${m.name}</span><span class="chip-remove" onclick="removeMember('${email}')">\u2715</span></div>`;
+    return `<div class="member-chip"><div class="chip-avatar">${getInitials(m.name)}</div><span>${m.name}</span><span class="chip-remove" onclick="removeMember('${email}')">✕</span></div>`;
   }).join('');
-  document.getElementById('memberCount').textContent = selectedMembers.length + '\u540D';
+  document.getElementById('memberCount').textContent = selectedMembers.length + '名';
 }
 async function searchSlots() {
-  if (selectedMembers.length === 0) { showToast('\u26A0\uFE0F \u53C2\u52A0\u8005\u3092\u9078\u629E\u3057\u3066\u304F\u3060\u3055\u3044', 'error'); return; }
+  if (selectedMembers.length === 0) { showToast('⚠️ 参加者を選択してください', 'error'); return; }
   const btn = document.getElementById('searchBtn');
   const slotList = document.getElementById('slotList');
-  btn.disabled = true; btn.innerHTML = '\u{1F504} \u691C\u7D22\u4E2D...';
-  slotList.innerHTML = '<div class="loading">\u7A7A\u304D\u67A0\u3092\u691C\u7D22\u3057\u3066\u3044\u307E\u3059...</div>';
+  btn.disabled = true; btn.innerHTML = '🔄 検索中...';
+  slotList.innerHTML = '<div class="loading">空き枠を検索しています...</div>';
   try {
     const duration = document.getElementById('durationSelect').value;
     const params = new URLSearchParams({ action: 'slots', duration, emails: selectedMembers.join(',') });
@@ -229,61 +229,61 @@ async function searchSlots() {
     const data = await res.json();
     if (data.status === 'success') {
       currentSlots = (data.slots || []).slice(0, 5);
-      document.getElementById('slotCount').textContent = currentSlots.length + '\u4EF6';
+      document.getElementById('slotCount').textContent = currentSlots.length + '件';
       if (currentSlots.length === 0) {
-        slotList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">\u{1F614}</div><div class="empty-state-text">\u7A7A\u304D\u67A0\u304C\u898B\u3064\u304B\u308A\u307E\u305B\u3093\u3067\u3057\u305F</div></div>';
+        slotList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">😔</div><div class="empty-state-text">空き枠が見つかりませんでした</div></div>';
       } else { renderSlots(currentSlots); }
       updateConnectionBadge(true);
     } else { throw new Error(data.message || 'error'); }
   } catch (e) {
-    slotList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">\u26A0\uFE0F</div><div class="empty-state-text">\u30A8\u30E9\u30FC: ' + e.message + '</div></div>';
+    slotList.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚠️</div><div class="empty-state-text">エラー: ' + e.message + '</div></div>';
     updateConnectionBadge(false);
-  } finally { btn.disabled = false; btn.innerHTML = '\u{1F50D} \u7A7A\u304D\u67A0\u3092\u691C\u7D22'; }
+  } finally { btn.disabled = false; btn.innerHTML = '🔍 空き枠を検索'; }
 }
 function renderSlots(slots) {
   const el = document.getElementById('slotList');
   el.innerHTML = '<div class="result-list">' + slots.map((slot, idx) => {
     const s = new Date(slot.start), e = new Date(slot.end);
-    const ds = (s.getMonth()+1)+'/'+s.getDate()+'('+['\u65E5','\u6708','\u706B','\u6C34','\u6728','\u91D1','\u571F'][s.getDay()]+')';
-    const ts = fmt(s)+' \u301C '+fmt(e);
+    const ds = (s.getMonth()+1)+'/'+s.getDate()+'('+['日','月','火','水','木','金','土'][s.getDay()]+')';
+    const ts = fmt(s)+' 〜 '+fmt(e);
     const sc = slot.score!=null?slot.score:'';
-    return `<div class="slot-card"><div><div class="slot-date">${ds}</div><div class="slot-time">${ts}</div></div><div class="slot-actions">${sc?'<span style="font-size:12px;font-weight:600;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:10px;">'+sc+'\u70B9</span>':''}<button class="btn-copy" onclick="copySlot(${idx})">\u{1F4CB} \u30B3\u30D4\u30FC</button><button class="btn-meet" id="meetBtn${idx}" onclick="createMeeting(${idx})">\u{1F4F9} \u30DF\u30FC\u30C6\u30A3\u30F3\u30B0\u4F5C\u6210</button></div></div>`;
+    return `<div class="slot-card"><div><div class="slot-date">${ds}</div><div class="slot-time">${ts}</div></div><div class="slot-actions">${sc?'<span style="font-size:12px;font-weight:600;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:10px;">'+sc+'点</span>':''}<button class="btn-copy" onclick="copySlot(${idx})">📋 コピー</button><button class="btn-meet" id="meetBtn${idx}" onclick="createMeeting(${idx})">📹 ミーティング作成</button></div></div>`;
   }).join('')+'</div>';
                 }
 async function createMeeting(index) {
   const slot = currentSlots[index];
   if (!slot) { showToast('No slot data', 'error'); return; }
-  const title = prompt('\u30DF\u30FC\u30C6\u30A3\u30F3\u30B0\u306E\u4EF6\u540D\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044:', '\u30DF\u30FC\u30C6\u30A3\u30F3\u30B0');
+  const title = prompt('ミーティングの件名を入力してください:', 'ミーティング');
   if (!title) return;
   const btn = document.getElementById('meetBtn' + index);
-  if (btn) { btn.disabled = true; btn.innerHTML = '\u23F3 \u4F5C\u6210\u4E2D\u2026'; }
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ 作成中…'; }
   try {
     const res = await fetch(GAS_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify({ action: 'create', title, start: slot.start, end: slot.end, attendees: selectedMembers, note: '' })
     });
     const data = await res.json();
-    if (data.status === 'success') { showMeetingSuccess(data, slot); showToast('\u{1F389} \u30DF\u30FC\u30C6\u30A3\u30F3\u30B0\u3092\u4F5C\u6210\u3057\u307E\u3057\u305F\uFF01', 'success'); }
-    else { showToast('\u4F5C\u6210\u30A8\u30E9\u30FC: ' + (data.message || ''), 'error'); }
-  } catch (e) { showToast('\u901A\u4FE1\u30A8\u30E9\u30FC: ' + e.message, 'error'); }
-  finally { if (btn) { btn.disabled = false; btn.innerHTML = '\u{1F4F9} \u30DF\u30FC\u30C6\u30A3\u30F3\u30B0\u4F5C\u6210'; } }
+    if (data.status === 'success') { showMeetingSuccess(data, slot); showToast('🎉 ミーティングを作成しました！', 'success'); }
+    else { showToast('作成エラー: ' + (data.message || ''), 'error'); }
+  } catch (e) { showToast('通信エラー: ' + e.message, 'error'); }
+  finally { if (btn) { btn.disabled = false; btn.innerHTML = '📹 ミーティング作成'; } }
 }
 function showMeetingSuccess(data, slot) {
   const s = new Date(slot.start), e = new Date(slot.end);
-  const ds = (s.getMonth()+1)+'/'+s.getDate()+'('+['\u65E5','\u6708','\u706B','\u6C34','\u6728','\u91D1','\u571F'][s.getDay()]+')';
-  const ts = fmt(s)+' \u301C '+fmt(e);
+  const ds = (s.getMonth()+1)+'/'+s.getDate()+'('+['日','月','火','水','木','金','土'][s.getDay()]+')';
+  const ts = fmt(s)+' 〜 '+fmt(e);
   const el = document.getElementById('slotList');
-  el.innerHTML = `<div class="success-card"><div style="font-size:48px;margin-bottom:12px;">\u{1F389}</div><h3>\u30DF\u30FC\u30C6\u30A3\u30F3\u30B0\u3092\u4F5C\u6210\u3057\u307E\u3057\u305F\uFF01</h3><div style="font-size:14px;color:var(--text-2);margin-bottom:4px;">\u53C2\u52A0\u8005\u5168\u54E1\u306B\u62DB\u5F85\u30E1\u30FC\u30EB\u304C\u9001\u4FE1\u3055\u308C\u307E\u3057\u305F</div><div class="detail-box"><div style="font-weight:600;font-size:16px;margin-bottom:8px;">\u{1F4CC} ${data.summary||''}</div><div style="color:var(--text-2);font-size:13px;">\u{1F4C5} ${ds} ${ts}</div>${data.meetLink?`<div><a href="${data.meetLink}" target="_blank" class="btn-meet-link">\u{1F4F9} Google Meet \u306B\u53C2\u52A0</a></div>`:''}${data.htmlLink?`<div><a href="${data.htmlLink}" target="_blank" class="btn-cal-link">\u{1F4CE} Google\u30AB\u30EC\u30F3\u30C0\u30FC\u3067\u958B\u304F \u2192</a></div>`:''}</div><div style="font-size:12px;color:var(--text-3);margin-top:12px;">${(data.attendees||[]).map(a=>a.email).join(', ')}</div><button onclick="searchSlots()" style="margin-top:16px;padding:8px 20px;background:var(--blue);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;">\u{1F50D} \u3082\u3046\u4E00\u5EA6\u691C\u7D22</button></div>`;
+  el.innerHTML = `<div class="success-card"><div style="font-size:48px;margin-bottom:12px;">🎉</div><h3>ミーティングを作成しました！</h3><div style="font-size:14px;color:var(--text-2);margin-bottom:4px;">参加者全員に招待メールが送信されました</div><div class="detail-box"><div style="font-weight:600;font-size:16px;margin-bottom:8px;">📌 ${data.summary||''}</div><div style="color:var(--text-2);font-size:13px;">📅 ${ds} ${ts}</div>${data.meetLink?`<div><a href="${data.meetLink}" target="_blank" class="btn-meet-link">📹 Google Meet に参加</a></div>`:''}${data.htmlLink?`<div><a href="${data.htmlLink}" target="_blank" class="btn-cal-link">📎 Googleカレンダーで開く →</a></div>`:''}</div><div style="font-size:12px;color:var(--text-3);margin-top:12px;">${(data.attendees||[]).map(a=>a.email).join(', ')}</div><button onclick="searchSlots()" style="margin-top:16px;padding:8px 20px;background:var(--blue);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:13px;font-weight:500;">🔍 もう一度検索</button></div>`;
 }
 function copySlot(index) {
   const slot = currentSlots[index]; if (!slot) return;
   const d = new Date(slot.start);
-  const text = (d.getMonth()+1)+'/'+d.getDate()+' '+fmt(d)+'\u301C';
-  navigator.clipboard.writeText(text).then(() => showToast('\u{1F4CB} \u30B3\u30D4\u30FC\u3057\u307E\u3057\u305F: '+text, 'success')).catch(()=>{});
+  const text = (d.getMonth()+1)+'/'+d.getDate()+' '+fmt(d)+'〜';
+  navigator.clipboard.writeText(text).then(() => showToast('📋 コピーしました: '+text, 'success')).catch(()=>{});
 }
 function fmt(d) { return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0'); }
-function getInitials(name) { if(!name)return'?';const p=name.replace(/[^\w\s\u3000-\u9FFF]/g,'').trim().split(/[\s\u3000]+/);if(p.length>=2)return(p[0][0]+p[1][0]).toUpperCase();return name.substring(0,2).toUpperCase(); }
+function getInitials(name) { if(!name)return'?';const p=name.replace(/[^\w\s　-鿿]/g,'').trim().split(/[\s　]+/);if(p.length>=2)return(p[0][0]+p[1][0]).toUpperCase();return name.substring(0,2).toUpperCase(); }
 function highlightMatch(text,query) { if(!query)return text;const idx=text.toLowerCase().indexOf(query.toLowerCase());if(idx===-1)return text;return text.substring(0,idx)+'<b style="color:var(--blue)">'+text.substring(idx,idx+query.length)+'</b>'+text.substring(idx+query.length); }
-function updateConnectionBadge(connected) { const b=document.getElementById('connBadge');if(connected){b.className='conn-badge ok';b.textContent='\u63A5\u7D9A\u4E2D';}else{b.className='conn-badge err';b.textContent='\u672A\u63A5\u7D9A';} }
+function updateConnectionBadge(connected) { const b=document.getElementById('connBadge');if(connected){b.className='conn-badge ok';b.textContent='接続中';}else{b.className='conn-badge err';b.textContent='未接続';} }
 function showToast(msg,type) { const el=document.getElementById('toastContainer');el.textContent=msg;el.style.background=type==='error'?'var(--red)':type==='success'?'var(--text)':'var(--yellow)';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500); }
 </script>
 </body>
@@ -821,7 +821,7 @@ function fmt(d) {
 
 function getInitials(name) {
   if (!name) return '?';
-  const parts = name.replace(/[^\w\s\u3000-\u9FFF]/g, '').trim().split(/[\s\u3000]+/);
+  const parts = name.replace(/[^\w\s　-鿿]/g, '').trim().split(/[\s　]+/);
   if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
   return name.substring(0, 2).toUpperCase();
 }
